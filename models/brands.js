@@ -2,37 +2,24 @@
 
 const Model = require('objection').Model
 
-class customers extends Model {
+class brands extends Model {
   // Table name is the only required property.
   static get tableName () {
-    return 'customers'
+    return 'brands'
   }
-  static getAllCustomersNotDeleted(){
-    return customers.query().select("*").where("deleted","=",false).eager('[orders]')
+  static async getBrandById(id) {
+    return brands.query().findOne({id})
   }
-  static getCustomerById (id) {
-    return customers.query().findOne({id})
+  static async getByName(body) {
+    return brands.query().findOne({name:body.name})
   }
-  static getCustomerByEmail (email) {
-    return customers.query().findOne({email: email})
-  }
-  static async createCustomer(body) {
-    return customers.query().insertAndFetch({
-      first_name: body.first_name,
-      last_name: body.last_name,
-      email: body.email,
-      password: body.password,
-      address: body.address,
-      phone_number: body.phone_number,
-      deleted:false,
-      confirmed:false
-    }).catch(e => {
-        console.log(e)
-        return { message: false, data: 'Data Corrupted or might have duplicates' }
-      })
-  }
-  static async viewProfile(id){
-    return customers.query().findOne({id}).eager('[orders]')
+  static createBrand (body) {
+    return brands.query().insertAndFetch({
+      name: body.name
+    })
+    .catch(err=>{
+      return { state:"failure", error: err}
+    })
   }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
@@ -68,16 +55,8 @@ class customers extends Model {
     // const transportation_companies_vehicles = require('./transportation_company_vehicle')
     // const cities = require('./city')
     // const transportationCompany = require('./local_transportation_company')
-    const order = require('./orders')
+
     return {
-      orders:{
-        relation: Model.HasManyRelation,
-        modelClass: order,
-        join: {
-          from: 'customers.id',
-          to: 'orders.customer_id'
-        }
-      }
     //   TransportationCompany: {
     //     relation: Model.HasManyRelation,
     //     modelClass: transportationCompany,
@@ -114,4 +93,4 @@ class customers extends Model {
   }
 }
 
-module.exports = customers
+module.exports = brands

@@ -2,11 +2,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 // const passport = require('passport')
 // const Group = require('../models/Group');
-const Admin = require('../models/Admin')
-const Customer = require('../models/Customer')
+const AdminModel = require('../models/admins')
+const CustomerModel = require('../models/customers')
 // const GroupUser = require('../models/GroupUser');
 // const User = require('../models/User')
-const tokenKey = require('../config').secretOrKey
+const tokenKey = require('../config/setup').secretOrKey
 require('dotenv').config();
 
 const Login =  async function (req, res) {
@@ -24,9 +24,10 @@ const Login =  async function (req, res) {
         return res.status(400).send({ status: 'failure', message: 'Login fields are missing' });
     }else{
         const { email, password } = req.body
-        const checkIfAdmin = await Admin.findOne({email})
+        const checkIfAdmin = await AdminModel.getAdminByEmail(email)
         if(!checkIfAdmin){
-            const checkIfCustomer = await Customer.findOne({email})
+            const checkIfCustomer = await CustomerModel.getCustomerByEmail(email)
+            console.log(checkIfCustomer)
             if(!checkIfCustomer){
                 return res.status(404).send({ status: 'failure', message: 'Invalid email or password' });
             }else{
@@ -36,10 +37,10 @@ const Login =  async function (req, res) {
                         return res.status(403).send({ status: 'failure', message: 'Account is currently deactivated request to activate your account through email' })
                     }else{
                         const payload = {
-                            id: checkIfCustomer._id
+                            id: checkIfCustomer.id
                         }
                         const token = jwt.sign(payload, tokenKey, { expiresIn: '5h' })
-                        return res.status(200).send({ status: 'success', token: `bearer ${token}`, type:'customer', id: checkIfCustomer._id })
+                        return res.status(200).send({ status: 'success', token: `bearer ${token}`, type:'customer', id: checkIfCustomer.id })
                     
                     }
                 }
@@ -51,10 +52,10 @@ const Login =  async function (req, res) {
                         return res.status(403).send({ status: 'failure', message: 'Account is currently deactivated request to activate your account through email' })
                     }else{
                         const payload = {
-                            id: checkIfAdmin._id
+                            id: checkIfAdmin.id
                         }
                         const token = jwt.sign(payload, tokenKey, { expiresIn: '5h' })
-                        return res.status(200).send({ status: 'success', token: `bearer ${token}`, type:'admin', id: checkIfAdmin._id })
+                        return res.status(200).send({ status: 'success', token: `bearer ${token}`, type:'admin', id: checkIfAdmin.id })
                     
                     }
                 }

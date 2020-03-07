@@ -12,10 +12,12 @@ const knex = knexInit(knexConfig[process.env.NODE_ENV])
 const app = express()
 
 Model.knex(knex)
-// const category = require('./routes/categories')
-// const admin = require('./routes/admins')
-// const session = require('./routes/sessions')
-// const customer = require('./routes/customers')
+const category = require('./routes/categories')
+const admin = require('./routes/admins')
+const session = require('./routes/sessions')
+const customer = require('./routes/customers')
+const model = require('./routes/models')
+const brand = require('./routes/brands')
 // const product = require('./routes/products')
 // const order = require('./routes/orders')
 
@@ -28,10 +30,12 @@ app.get('/', (req, res) => {
     res.send(`<h1>Welcome to bStore</h1>`)
 })
 
-// app.use('/api/categories', category);
-// app.use('/api/admins', admin)
-// app.use('/api/sessions', session); // Used For Login , Activation , Deactivation , Forgetting Password if needed
-// app.use('/api/customers', customer)
+app.use('/api/categories', category);
+app.use('/api/admins', admin)
+app.use('/api/sessions', session); // Used For Login , Activation , Deactivation , Forgetting Password if needed
+app.use('/api/customers', customer)
+app.use('/api/models', model)
+app.use('/api/brands', brand)
 // app.use('/api/products', product)
 // app.use('/api/orders', order)
 

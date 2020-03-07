@@ -7,6 +7,29 @@ class products extends Model {
   static get tableName () {
     return 'products'
   }
+  static getProductById (id) {
+    return products.query().findOne({id})
+  }
+  static async getProductByName (name) {
+    const fetchData = await products.query().findOne({name}) 
+    return fetchData
+  }
+
+  static async createProduct (body){
+    return products.query().insertAndFetch({
+      name: body.name,
+      description: body.description,
+      brand_id: body.brand_id,
+      model_id: body.model_id,
+      category_id: body.category_id,
+      price: body.price,
+      stock: body.stock,
+      deleted: false
+    })
+    .catch(err=>{
+      return { state:"failure", error: err}
+    })
+  }
 
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {

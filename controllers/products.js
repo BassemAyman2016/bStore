@@ -2,8 +2,9 @@ const bcrypt = require('bcryptjs');
 // const jwt = require('jsonwebtoken')
 // const passport = require('passport')
 // const Group = require('../models/Group');
-const Product = require('../models/Product')
-const Admin = require('../models/Admin')
+const ProductModel = require('../models/products')
+const AdminModel = require('../models/admins')
+const ProductImagesModel = require('../models/prodcut_images')
 // const tokenKey = require('../config').secretOrKey
 require('dotenv').config();
 
@@ -11,7 +12,7 @@ const createProduct =  async function (req, res) {
     var valid_params = req.body &&
     req.body.name && req.body.description && req.body.brand && req.body.model &&
     req.body.price && req.body.category_id && req.body.stock && req.body.images
-    const checkIfAdmin = await Admin.findOne({ _id : req.id })
+    const checkIfAdmin = await AdminModel.getAdminById(req.id)
     if(!checkIfAdmin){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
@@ -19,11 +20,12 @@ const createProduct =  async function (req, res) {
         return res.status(400).send({ status: 'failure', message: 'Product creation paramters are missing' });
     }else{
         const name = req.body.name
-        const findIfProductWithSameNameExists = await Product.findOne({ 'name': name });
+        // const findIfProductWithSameNameExists = await ProductModel.findOne({ 'name': name });
+        const findIfProductWithSameNameExists = await ProductModel.getProductByName(name);
         if(findIfProductWithSameNameExists){
             return res.status(400).send({ status: 'failure', message: 'Product already exists' })
         }else{
-            const newProduct = await Product.create(req.body);
+            const newProduct = await ProductModel.createProduct(req.body);
             if(newProduct){
                 return res.status(200).send({ status: 'success', msg: 'Product created successfully', data: newProduct });
             }else{

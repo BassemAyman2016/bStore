@@ -2,8 +2,8 @@ const bcrypt = require('bcryptjs');
 // const jwt = require('jsonwebtoken')
 // const passport = require('passport')
 // const Group = require('../models/Group');
-const Customer = require('../models/Customer')
-const Admin = require('../models/Admin')
+const CustomerModel = require('../models/customers')
+const AdminModel = require('../models/admins')
 // const GroupUser = require('../models/GroupUser');
 // const User = require('../models/User')
 // const tokenKey = require('../config').secretOrKey
@@ -17,16 +17,14 @@ const customerSignup =  async function (req, res) {
         return res.status(400).send({ status: 'failure', message: 'Signup Paramters are missing' });
     }else{
         const email = req.body.email
-        const findEmailAlreadyExists = await Customer.findOne({ 'email': email });
+        const findEmailAlreadyExists = await CustomerModel.getCustomerByEmail( email );
         if(findEmailAlreadyExists){
             return res.status(400).send({ status: 'failure', message: 'Email Already Exists' })
         }else{
             const encrypted = bcrypt.genSaltSync(10);
             const hashedPassword = bcrypt.hashSync(req.body.password, encrypted);
-            const {first_name , last_name , email ,
-            address , phone_number} = req.body
-            const newCustomer = await Customer.create({first_name , last_name , email , password:hashedPassword ,
-                address , phone_number});
+            req.body.password=hashedPassword 
+            const newCustomer = await CustomerModel.createCustomer(req.body);
             if(newCustomer){
                 return res.status(200).send({ status: 'success', msg: 'User created successfully', data: newCustomer });
             }else{
@@ -36,12 +34,12 @@ const customerSignup =  async function (req, res) {
     }
 }
 const getAllCustomers = async (req,res) => {
-    const checkIfAdmin = await Admin.findOne({ _id : req.id })
+    const checkIfAdmin = await AdminModel.getAdminById(req.id)
     if(!checkIfAdmin){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
     try {
-        const allCustomers = await Customer.find();
+        const allCustomers = await CustomerModel.getAllCustomersNotDeleted();
         if(allCustomers){
             return res.status(200).send({ status: 'success', data: allCustomers });
         }else{
@@ -54,7 +52,8 @@ const getAllCustomers = async (req,res) => {
 }
 const viewProfile = async (req,res) => {
     try {
-        const checkIfUserExists = await Customer.findOne({ _id : req.id }).populate('orders')
+        // const checkIfUserExists = await Customer.findOne({ _id : req.id }).populate('orders')
+        const checkIfUserExists = await CustomerModel.viewProfile(req.id)
         if(!checkIfUserExists){
             return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
         }else{

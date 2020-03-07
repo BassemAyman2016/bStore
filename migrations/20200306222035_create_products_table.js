@@ -8,6 +8,7 @@ exports.up = knex =>
     table.integer('brand_id').references('brands.id').notNullable()
     table.integer('model_id').references('models.id').notNullable()
     table.boolean("deleted")
+    table.double('price')
 });
 
 exports.down = knex => knex.schema.dropTableIfExists("products");

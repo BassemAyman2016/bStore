@@ -5,12 +5,12 @@ exports.seed = function(knex) {
     .then(function () {
       // Inserts seed entries
       return knex('models').insert([
-        {id: 1, name: 'Galaxy'},
-        {id: 2, name: 'Xperia'},
-        {id: 3, name: 'IPhone'},
-        {id: 4, name: 'IPod'},
-        {id: 5, name: 'Wardrobe'},
-        {id: 6, name: 'Mac'}
+        { name: 'Galaxy'},
+        { name: 'Xperia'},
+        { name: 'IPhone'},
+        { name: 'IPod'},
+        { name: 'Wardrobe'},
+        { name: 'Mac'}
       ]);
     });
 };

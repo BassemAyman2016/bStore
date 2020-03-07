@@ -7,6 +7,24 @@ class admins extends Model {
   static get tableName () {
     return 'admins'
   }
+  static getAdminById (id) {
+    return admins.query().findOne({id})
+  }
+  static async getAdminByEmail (email) {
+    const fetchData = await admins.query().findOne({email: email}) 
+    return fetchData
+  }
+  static async createAdmin(body) {
+    return admins.query().insertAndFetch({
+      first_name: body.first_name,
+      last_name: body.last_name,
+      email: body.email,
+      password: body.password
+    }).catch(e => {
+        console.log(e)
+        return { message: false, data: 'Data Corrupted or might have duplicates' }
+      })
+  }
 
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {

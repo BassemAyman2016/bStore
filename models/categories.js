@@ -7,7 +7,20 @@ class categories extends Model {
   static get tableName () {
     return 'categories'
   }
-
+  static async getCategoryById(id) {
+    return categories.query().findOne({id})
+  }
+  static async getByName(body) {
+    return categories.query().findOne({name:body.name})
+  }
+  static createCategory (body) {
+    return categories.query().insertAndFetch({
+      name: body.name
+    })
+    .catch(err=>{
+      return { state:"failure", error: err}
+    })
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []
