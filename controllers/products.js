@@ -10,7 +10,7 @@ require('dotenv').config();
 
 const createProduct =  async function (req, res) {
     var valid_params = req.body &&
-    req.body.name && req.body.description && req.body.brand && req.body.model &&
+    req.body.name && req.body.description && req.body.brand_id && req.body.model_id &&
     req.body.price && req.body.category_id && req.body.stock && req.body.images
     const checkIfAdmin = await AdminModel.getAdminById(req.id)
     if(!checkIfAdmin){
@@ -27,7 +27,12 @@ const createProduct =  async function (req, res) {
         }else{
             const newProduct = await ProductModel.createProduct(req.body);
             if(newProduct){
-                return res.status(200).send({ status: 'success', msg: 'Product created successfully', data: newProduct });
+                const insertProductImages = ProductImagesModel.insertProductImages(req.body.images, newProduct.id)
+                if(insertProductImages){
+                    return res.status(200).send({ status: 'success', message: 'Product created successfully', data: newProduct });
+                }else{
+                    return res.status(400).send({ status: 'failure', message: 'Error while creating product images' })    
+                }
             }else{
                 return res.status(400).send({ status: 'failure', message: 'Error while creating product' })
             }
@@ -35,7 +40,7 @@ const createProduct =  async function (req, res) {
     }
 }
 const getAllProducts = async function (req, res) {
-    const allProducts = await Product.find().populate('category_id')
+    const allProducts = await ProductModel.getAllProducts()
     if(allProducts){
         return res.status(200).send({ status:"succes", data:allProducts })
     }else{
@@ -51,7 +56,7 @@ const editProduct = async function (req, res) {
     if(!product_id){
         return res.status(400).send({ status: 'failure', message: 'no product selected' });
     }
-    const checkIfAdmin = await Admin.findOne({ _id : req.id })
+    const checkIfAdmin = await AdminModel.getAdminById(req.id)
     if(!checkIfAdmin){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
@@ -65,16 +70,16 @@ const editProduct = async function (req, res) {
     if(req.body.stock) editObject.stock = req.body.stock
     if(req.body.images) editObject.images = req.body.images 
     console.log("editObject",editObject)
-    const findProduct = await Product.findOne({_id:product_id})
+    const findProduct = await ProductModel.getProductById(product_id)
     if(!findProduct){
         return res.status(400).send({ status: 'failure', message: 'Product not found' })
     }
     try{
-        const updateProduct = await Product.findOneAndUpdate( {_id:product_id} , editObject)
-        if(updateProduct){
-            return res.status(200).send({ status: 'success', msg: 'Product edited successfully', data: updateProduct });
+        const updateProduct = await ProductModel.editProduct(editObject, findProduct)
+        if(updateProduct && !updateProduct.state){
+            return res.status(200).send({ status: 'success', message: 'Product edited successfully', data: updateProduct });
         }else{
-            return res.status(400).send({ status: 'failure', message: 'Error while updating product info' })
+            return res.status(400).send({ status: 'failure', message: 'Error while updating product info' , err:updateProduct })
         }   
     }catch(e){
         console.log(e)
@@ -83,7 +88,7 @@ const editProduct = async function (req, res) {
 }
 const deleteProduct =  async function (req, res) {
     var valid_params = req.params
-    const checkIfAdmin = await Admin.findOne({ _id : req.id })
+    const checkIfAdmin = await AdminModel.getAdminById(req.id)
     if(!checkIfAdmin){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
@@ -95,11 +100,16 @@ const deleteProduct =  async function (req, res) {
             return res.status(400).send({ status: 'failure', message: 'no product selected' });
         }
         try {
-            const findIfProductExists = await Product.findOne({ '_id': product_id });
+            const findIfProductExists = await ProductModel.getProductById(product_id)
             if(findIfProductExists){
-            const productDeleted = await Product.findOneAndDelete({_id:product_id})
-            if(productDeleted){
-                    return res.status(200).send({ status: 'success', msg: 'Product deleted successfully', data: productDeleted });
+                const productDeleted = await ProductModel.setDeleted(product_id)
+                if(productDeleted){
+                    const deleteProductImages = await ProductImagesModel.setDeleted(product_id)
+                    if(deleteProductImages){
+                        return res.status(200).send({ status: 'success', message: 'Product deleted successfully', data: productDeleted });
+                    }else{
+                        return res.status(400).send({ status: 'failure', message: 'Error while deleting product images' })
+                    }
                 }else{
                     return res.status(400).send({ status: 'failure', message: 'Error while deleting product info' })
                 } 

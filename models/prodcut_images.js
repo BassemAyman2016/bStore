@@ -16,20 +16,25 @@ class product_images extends Model {
   //   return fetchData
   // }
 
-  static async insertProductImages (body){
-    // return products.query().insertAndFetch({
-    //   name: body.name,
-    //   description: body.description,
-    //   brand_id: body.brand_id,
-    //   model_id: body.model_id,
-    //   category_id: body.category_id,
-    //   price: body.price,
-    //   stock: body.stock,
-    //   deleted: false
-    // })
-    // .catch(err=>{
-    //   return { state:"failure", error: err}
-    // })
+  static async insertProductImages ( images_array, productId){
+    var data = []
+    const insertions = await Promise.all(images_array.map(async image => {
+      const insert = await product_images.query().insertAndFetch({
+        product_id: productId,
+        img: image,
+        deleted:false
+      }).then(res => {
+        data.push(res)
+      })
+      return insert
+    }))
+    return data
+  }
+
+  static async setDeleted(id){
+    return product_images.query().update({
+      deleted:true
+    }).where("product_id","=",id)
   }
 
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {

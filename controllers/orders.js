@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcryptjs');
 // const jwt = require('jsonwebtoken')
 // const passport = require('passport')
 // const Group = require('../models/Group');
@@ -7,14 +7,15 @@ const bcrypt = require('bcryptjs');
 // const Order = require('../models/Order')
 // const Customer = require('../models/Customer')
 // const tokenKey = require('../config').secretOrKey
-const Customer = require('../models/Customer')
-const Order = require('../models/Order')
-const Admin = require('../models/Admin')
+const CustomerModel = require('../models/customers')
+const orderModel = require('../models/orders')
+const AdminModel = require('../models/admins')
+const ProductModel = require('../models/products')
 require('dotenv').config();
 
 const createOrder =  async function (req, res) {
     var valid_params = req.body && req.body.products 
-    const checkIfUserExists = await Customer.findOne({ _id : req.id , deleted:false })
+    const checkIfUserExists = await CustomerModel.getCustomerById(req.id)
     if(!checkIfUserExists){
         return res.status(403).send({ status: 'failure', message: 'you are not a user of this platform' });
     }
@@ -22,20 +23,36 @@ const createOrder =  async function (req, res) {
         return res.status(400).send({ status: 'failure', message: 'Order creation paramters are missing' });
     }else{
         try{
-            const orderCreated = await Order.create({ products:req.body.products , user_id: req.id })
-            if(orderCreated){
-                const appendOrderToUserOrders = await Customer.updateOne({_id:checkIfUserExists._id}, {orders:[...checkIfUserExists.orders,orderCreated._id]})
-                if(appendOrderToUserOrders){
-                    return res.status(200).send({ status: 'success', msg: 'Order created successfully', data: appendOrderToUserOrders });
-                }else{
-                    return res.status(400).send({ status: 'failure', message: 'Error occured while adding order to previous user orders' })
+            // const orderCreated = await Order.create({ products:req.body.products , user_id: req.id })
+            // const orderCreated = await Order.create({ products:req.body.products , user_id: req.id })
+            // if(orderCreated){
+            //     const appendOrderToUserOrders = await Customer.updateOne({_id:checkIfUserExists._id}, {orders:[...checkIfUserExists.orders,orderCreated._id]})
+            //     if(appendOrderToUserOrders){
+            //         return res.status(200).send({ status: 'success', message: 'Order created successfully', data: appendOrderToUserOrders });
+            //     }else{
+            //         return res.status(400).send({ status: 'failure', message: 'Error occured while adding order to previous user orders' })
+            //     }
+            // }else{
+            //     return res.status(400).send({ status: 'failure', message: 'Error occured while creating order' })
+            // }
+            var itemUnavailable = false 
+            var dummyArray = []
+            var priceSum = 0
+            var checkItems = await Promise.all( req.body.products.map(async (product_id)=>{
+                var productObject = await ProductModel.getProductById(product_id)
+                priceSum += productObject.price
+                console.log(product_id , productObject)
+                if(productObject.stock<=0){
+                    itemUnavailable = true
                 }
-            }else{
-                return res.status(400).send({ status: 'failure', message: 'Error occured while creating order' })
+            }))
+            if(itemUnavailable){
+                return res.status(400).send({ status: 'failure', message: 'An item(s) is unavailable, please refresh page' })    
             }
+            return res.status(200).send({ status: 'success', message: 'Order created successfully', data: itemUnavailable , con:priceSum});
         }catch(err){
             console.log(err)
-            return res.status(400).send({ status: 'failure', message: 'Error occured in order creation' })
+            return res.status(400).send({ status: 'failure', message: 'Error occured in order creation' , err: err })
         }
     }
 }

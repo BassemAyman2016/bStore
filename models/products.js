@@ -8,10 +8,15 @@ class products extends Model {
     return 'products'
   }
   static getProductById (id) {
-    return products.query().findOne({id})
+    return products.query().findOne({id}).eager('[images,Category,Model,Brand]')
   }
   static async getProductByName (name) {
-    const fetchData = await products.query().findOne({name}) 
+    const fetchData = await products.query().findOne({name}).eager('[images,Category,Model,Brand]')
+    return fetchData
+  }
+
+  static async getAllProducts () {
+    const fetchData = await products.query().select('*').where("deleted","=",false).eager('[images,Category,Model,Brand]') 
     return fetchData
   }
 
@@ -30,7 +35,25 @@ class products extends Model {
       return { state:"failure", error: err}
     })
   }
-
+  static async editProduct (body,original){
+    const updateProduct =  await products.query().update({
+      name: body.name?body.name: original.name,
+      description: body.description?body.description:original.description,
+      brand_id: body.brand_id?body.brand_id:original.brand_id,
+      model_id: body.model_id?body.model_id:original.model_id,
+      category_id: body.category_id?body.category_id:original.category_id,
+      price: body.price?body.price:original.price,
+      stock: body.stock?body.stock:original.stock
+    }).where("id","=",original.id).catch(e => {
+      return { state: "failure", data: 'Error in edit product model' , error:e }
+    })
+    return products.query().findOne({id:original.id}).eager('[images,Category,Model,Brand]')
+  }
+  static async setDeleted(id){
+    return products.query().update({
+      deleted:true
+    }).where("id","=",id)
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []
@@ -65,8 +88,43 @@ class products extends Model {
     // const transportation_companies_vehicles = require('./transportation_company_vehicle')
     // const cities = require('./city')
     // const transportationCompany = require('./local_transportation_company')
-
+    const ProductImages = require('./prodcut_images')
+    const category = require('./categories')
+    const brand = require('./brands')
+    const model = require('./models')
     return {
+      images:{
+        relation: Model.HasManyRelation,
+        modelClass: ProductImages,
+        join:{
+          from: 'products.id',
+          to: "product_images.product_id"
+        }
+      },
+      Category:{
+        relation: Model.HasOneRelation,
+        modelClass: category,
+        join:{
+          from: 'products.category_id',
+          to: "categories.id"
+        }
+      },
+      Model:{
+        relation: Model.HasOneRelation,
+        modelClass: model,
+        join:{
+          from: 'products.model_id',
+          to: "models.id"
+        }
+      },
+      Brand:{
+        relation: Model.HasOneRelation,
+        modelClass: brand,
+        join:{
+          from: 'products.brand_id',
+          to: "brands.id"
+        }
+      }
     //   TransportationCompany: {
     //     relation: Model.HasManyRelation,
     //     modelClass: transportationCompany,

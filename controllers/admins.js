@@ -24,7 +24,7 @@ const adminSighUp =  async function (req, res) {
             req.body.password = hashedPassword
             const newAdmin = await AdminModel.createAdmin(req.body)
             if(newAdmin){
-                res.status(200).send({ status: 'success', msg: 'User created successfully', data: newAdmin });
+                res.status(200).send({ status: 'success', message: 'User created successfully', data: newAdmin });
             }else{
                 return res.status(400).send({ status: 'failure', message: 'Error while creating admin' })
             }

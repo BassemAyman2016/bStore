@@ -18,8 +18,8 @@ const session = require('./routes/sessions')
 const customer = require('./routes/customers')
 const model = require('./routes/models')
 const brand = require('./routes/brands')
-// const product = require('./routes/products')
-// const order = require('./routes/orders')
+const product = require('./routes/products')
+const order = require('./routes/orders')
 
 
 app.use(express.json())
@@ -36,8 +36,8 @@ app.use('/api/sessions', session); // Used For Login , Activation , Deactivation
 app.use('/api/customers', customer)
 app.use('/api/models', model)
 app.use('/api/brands', brand)
-// app.use('/api/products', product)
-// app.use('/api/orders', order)
+app.use('/api/products', product)
+app.use('/api/orders', order)
 
 const port = process.env.PORT
 app.listen(port, (req, res) => {

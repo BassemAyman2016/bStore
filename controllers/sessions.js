@@ -12,7 +12,7 @@ require('dotenv').config();
 const Login =  async function (req, res) {
     // const categoryCreation = await Category.create(req.body)
     // if(categoryCreation){
-    //     res.status(200).send({ status: 'success', msg: 'category created successfully', data: categoryCreation })
+    //     res.status(200).send({ status: 'success', message: 'category created successfully', data: categoryCreation })
     //     console.log(categoryCreation)
     // }else{
     //     console.log(e)

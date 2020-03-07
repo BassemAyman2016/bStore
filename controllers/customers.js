@@ -26,7 +26,7 @@ const customerSignup =  async function (req, res) {
             req.body.password=hashedPassword 
             const newCustomer = await CustomerModel.createCustomer(req.body);
             if(newCustomer){
-                return res.status(200).send({ status: 'success', msg: 'User created successfully', data: newCustomer });
+                return res.status(200).send({ status: 'success', message: 'User created successfully', data: newCustomer });
             }else{
                 return res.status(400).send({ status: 'failure', message: 'Error while creating user' })
             }
