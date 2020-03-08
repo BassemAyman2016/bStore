@@ -54,6 +54,16 @@ class products extends Model {
       deleted:true
     }).where("id","=",id)
   }
+
+  static async decrementProductStock (productsArray) {
+    var edits = await Promise.all([productsArray.map(async originalProduct=>{
+      var decrements = await products.query().update({
+        stock:originalProduct.stock-1
+      }).where('id','=',originalProduct.id).andWhere("name","=",originalProduct.name)
+      return decrements
+    })])
+    return edits
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []

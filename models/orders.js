@@ -8,6 +8,15 @@ class orders extends Model {
     return 'orders'
   }
 
+  static async createOrder(customer_id, priceSum ){
+    return orders.query().insertAndFetch({
+      payed:false,
+      cancelled:false,
+      customer_id: customer_id,
+      total_price: priceSum
+    })
+  }
+
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []

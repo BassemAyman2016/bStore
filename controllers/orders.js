@@ -8,9 +8,10 @@
 // const Customer = require('../models/Customer')
 // const tokenKey = require('../config').secretOrKey
 const CustomerModel = require('../models/customers')
-const orderModel = require('../models/orders')
+const OrderModel = require('../models/orders')
 const AdminModel = require('../models/admins')
 const ProductModel = require('../models/products')
+const OrderProducts = require('../models/order_products')
 require('dotenv').config();
 
 const createOrder =  async function (req, res) {
@@ -36,20 +37,39 @@ const createOrder =  async function (req, res) {
             //     return res.status(400).send({ status: 'failure', message: 'Error occured while creating order' })
             // }
             var itemUnavailable = false 
-            var dummyArray = []
+            var products = []
             var priceSum = 0
             var checkItems = await Promise.all( req.body.products.map(async (product_id)=>{
                 var productObject = await ProductModel.getProductById(product_id)
                 priceSum += productObject.price
-                console.log(product_id , productObject)
+                products.push(productObject)
                 if(productObject.stock<=0){
                     itemUnavailable = true
                 }
+                return productObject
             }))
-            if(itemUnavailable){
-                return res.status(400).send({ status: 'failure', message: 'An item(s) is unavailable, please refresh page' })    
+            if(checkItems){
+                if(itemUnavailable){
+                    return res.status(400).send({ status: 'failure', message: 'An item(s) is unavailable, please refresh page' })    
+                }else{
+                    const createOrder = await OrderModel.createOrder(checkIfUserExists.id,priceSum)
+                    if(!createOrder){
+                        return res.status(404).send({ status: 'failure', message: 'Error occured in order creation'})
+                    }
+                    const decreaseProductStock = await ProductModel.decrementProductStock(products)
+                    if(!decreaseProductStock){
+                        return res.status(404).send({ status: 'failure', message: 'Error occured in order creation' })
+                    }
+                    const insertOrderProducts = await OrderProducts.insertProducts(products,createOrder)
+                    if(insertOrderProducts)
+                        return res.status(200).send({ status: 'success', message: 'Order created successfully'});
+                    else{
+                        return res.status(401).send({ status: 'failure', message: 'Error occured in order creation'  })
+                    }
+
+                }
             }
-            return res.status(200).send({ status: 'success', message: 'Order created successfully', data: itemUnavailable , con:priceSum});
+            
         }catch(err){
             console.log(err)
             return res.status(400).send({ status: 'failure', message: 'Error occured in order creation' , err: err })

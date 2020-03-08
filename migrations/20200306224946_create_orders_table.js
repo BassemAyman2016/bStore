@@ -3,6 +3,7 @@ exports.up = knex =>
     table.increments('id').primary()
     table.boolean("payed")
     table.boolean("cancelled")
+    table.timestamp("created_at").defaultTo(knex.fn.now())
     table.timestamp("payed_at")
     table.timestamp("cancelled_at")
     table.integer("customer_id").references('customers.id').notNullable().onDelete('cascade')

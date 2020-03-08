@@ -8,6 +8,19 @@ class order_products extends Model {
     return 'order_products'
   }
 
+  static async insertProducts(products,order){
+    const productInsertions = await Promise.all([products.map(async singleProduct=>{
+      var holder = []
+      const singleInsertion = await order_products.query().insertAndFetch({
+        order_id:order.id,
+        product_id:singleProduct.id
+      }).then(res=>{
+        holder.push(res)
+      })
+      return holder[0]
+    })])
+    return productInsertions
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []
