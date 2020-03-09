@@ -20,22 +20,13 @@ const createOrder =  async function (req, res) {
     if(!checkIfUserExists){
         return res.status(403).send({ status: 'failure', message: 'you are not a user of this platform' });
     }
+    if(checkIfUserExists.deleted){
+        return res.status(403).send({ status: 'failure', message: 'your account is deactivated' });
+    }
     if(!valid_params){
         return res.status(400).send({ status: 'failure', message: 'Order creation paramters are missing' });
     }else{
         try{
-            // const orderCreated = await Order.create({ products:req.body.products , user_id: req.id })
-            // const orderCreated = await Order.create({ products:req.body.products , user_id: req.id })
-            // if(orderCreated){
-            //     const appendOrderToUserOrders = await Customer.updateOne({_id:checkIfUserExists._id}, {orders:[...checkIfUserExists.orders,orderCreated._id]})
-            //     if(appendOrderToUserOrders){
-            //         return res.status(200).send({ status: 'success', message: 'Order created successfully', data: appendOrderToUserOrders });
-            //     }else{
-            //         return res.status(400).send({ status: 'failure', message: 'Error occured while adding order to previous user orders' })
-            //     }
-            // }else{
-            //     return res.status(400).send({ status: 'failure', message: 'Error occured while creating order' })
-            // }
             var itemUnavailable = false 
             var products = []
             var priceSum = 0
@@ -77,12 +68,12 @@ const createOrder =  async function (req, res) {
     }
 }
 const getAllOrders = async (req,res) => {
-    const checkIfAdmin = await Admin.findOne({ _id : req.id })
+    const checkIfAdmin = await AdminModel.getAdminById(req.id)
     if(!checkIfAdmin){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
     try {
-        const allOrders = await Order.find().populate('products');
+        const allOrders = await OrderModel.getAllOrders();
         if(allOrders){
             return res.status(200).send({ status: 'success', data: allOrders });
         }else{
@@ -94,12 +85,15 @@ const getAllOrders = async (req,res) => {
     }
 }
 const getCustomersOrders = async (req,res) => {
-    const checkIfCustomer = await Customer.findOne({ _id : req.id })
+    const checkIfCustomer = await CustomerModel.getCustomerById(req.id)
     if(!checkIfCustomer){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
+    if(checkIfCustomer.deleted){
+        return res.status(403).send({ status: 'failure', message: 'your account is deactivated' });
+    }
     try {
-        const customerOrders = await Order.find({ user_id: req.id}).populate('products')
+        const customerOrders = await OrderModel.getCertainCustomerOrders(checkIfCustomer.id)
             // await Order.find().populate('products');
         if(customerOrders){
             return res.status(200).send({ status: 'success', data: customerOrders });
@@ -116,13 +110,15 @@ const getCustomerSingleOrder = async (req,res) => {
     if(!valid_params){
         return res.status(400).send({ status: 'failure', message: 'Order fetch paramters are missing' });
     }
-    const checkIfCustomer = await Customer.findOne({ _id : req.id })
+    const checkIfCustomer = await CustomerModel.getCustomerById(req.id)
     if(!checkIfCustomer){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
+    if(checkIfCustomer.deleted){
+        return res.status(403).send({ status: 'failure', message: 'your account is deactivated' });
+    }
     try {
-        const customerOrder = await Order.findOne({ _id: req.params.order_id , user_id: req.id}).populate('products')
-            // await Order.find().populate('products');
+        const customerOrder = await OrderModel.getSingleOrder(req.params.order_id, checkIfCustomer.id)
         if(customerOrder){
             return res.status(200).send({ status: 'success', data: customerOrder });
         }else{
@@ -138,18 +134,41 @@ const cancelOrder = async (req,res) => {
     if(!valid_params){
         return res.status(400).send({ status: 'failure', message: 'Order cancellation paramters are missing' });
     }
-    const checkIfCustomer = await Customer.findOne({ _id : req.id })
+    const checkIfCustomer = await CustomerModel.getCustomerById(req.id)
     if(!checkIfCustomer){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
+    if(checkIfCustomer.deleted){
+        return res.status(403).send({ status: 'failure', message: 'your account is deactivated' });
+    }
     try {
-        const cancelOrder = await Order.findOneAndUpdate({ _id: req.params.order_id , user_id: req.id}, {cancelled:true})
-            // await Order.find().populate('products');
-        if(cancelOrder){
-            return res.status(200).send({ status: 'success', data: cancelOrder });
-        }else{
+        const findOrder = await OrderModel.getSingleOrder(req.params.order_id,checkIfCustomer.id)
+        if(!findOrder){
+            return res.status(401).send({ status: 'failure', message: 'Order not found' });
+        }
+        if( findOrder.payed ){
+            return res.status(401).send({ status: 'failure', message: 'Order is already payed' });
+        }
+        if( findOrder.cancelled ){
+            return res.status(401).send({ status: 'failure', message: 'Order is already cancelled' });
+        }
+        const cancelOrder = await OrderModel.cancelOrder(req.params.order_id,checkIfCustomer.id)
+        if(!cancelOrder){
             return res.status(400).send({ status: 'failure', message: 'Error while cancelling order' })
-        }            
+            return res.status(200).send({ status: 'success', message:"Order cancelled successfully", data: cancelOrder });
+        }
+        const  orderItems = await OrderProducts.getOrderProducts(req.params.order_id)    
+        if(!orderItems){
+            return res.status(401).send({ status: 'failure', message: 'Error occurred while fetching order products' });
+        }
+        const restoreItemsStock = await ProductModel.restoreItems(orderItems)
+        if(!restoreItemsStock){
+            return res.status(401).send({ status: 'failure', message: 'Error occurred while restoring product stocks' });
+        }
+        if(restoreItemsStock.state && restoreItemsStock.state=="failure"){
+            return res.status(401).send({ status: 'failure', message: 'Error occurred while restoring product stocks error' });
+        }   
+        return res.status(200).send({ status: 'success', message:"Order cancelled successfully" });
     } catch (error) {
         console.log(error)
         return res.status(401).send({ status: 'failure', message: 'Error occurred while cancelling order' })

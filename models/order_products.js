@@ -21,6 +21,10 @@ class order_products extends Model {
     })])
     return productInsertions
   }
+
+  static async getOrderProducts(order_id){
+    return order_products.query().select("product_id").where("order_id",order_id).eager('[product]')
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []
@@ -55,8 +59,16 @@ class order_products extends Model {
     // const transportation_companies_vehicles = require('./transportation_company_vehicle')
     // const cities = require('./city')
     // const transportationCompany = require('./local_transportation_company')
-
+    const Product = require('./products')
     return {
+      product:{
+        relation: Model.BelongsToOneRelation,
+        modelClass: Product,
+        join:{
+          from:'order_products.product_id',
+          to:'products.id'
+        }
+      }
     //   TransportationCompany: {
     //     relation: Model.HasManyRelation,
     //     modelClass: transportationCompany,

@@ -64,6 +64,22 @@ class products extends Model {
     })])
     return edits
   }
+
+  static async restoreItems (productsArray) {
+    try {
+      var edits = await Promise.all([productsArray.map(async singleProduct=>{
+      var increments = await products.query().update({
+        stock:singleProduct.product.stock+1
+      }).where('id','=',singleProduct.product_id).andWhere("name","=",singleProduct.product.name)
+      return increments
+    })])
+    return edits
+    } catch (error) {
+      console.log(error)
+      return { state:"failure",error:error}
+    }
+    
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []

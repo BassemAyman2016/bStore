@@ -5,6 +5,9 @@ const bcrypt = require('bcryptjs');
 const ProductModel = require('../models/products')
 const AdminModel = require('../models/admins')
 const ProductImagesModel = require('../models/prodcut_images')
+const BrandModel = require('../models/brands')
+const ModelModel = require('../models/models')
+const CategoryModel = require('../models/categories')
 // const tokenKey = require('../config').secretOrKey
 require('dotenv').config();
 
@@ -15,6 +18,18 @@ const createProduct =  async function (req, res) {
     const checkIfAdmin = await AdminModel.getAdminById(req.id)
     if(!checkIfAdmin){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
+    }
+    const checkIfCategoryExists = await CategoryModel.getCategoryById(req.body.category_id)
+    if(!checkIfCategoryExists){
+        return res.status(403).send({ status: 'failure', message: 'category not found' });
+    }
+    const checkIfBrandExists = await BrandModel.getBrandById(req.body.brand_id)
+    if(!checkIfBrandExists){
+        return res.status(403).send({ status: 'failure', message: 'brand not found' });
+    }
+    const checkIfModelExists = await ModelModel.getModelById(req.body.model_id)
+    if(!checkIfModelExists){
+        return res.status(403).send({ status: 'failure', message: 'model not found' });
     }
     if(!valid_params){
         return res.status(400).send({ status: 'failure', message: 'Product creation paramters are missing' });
