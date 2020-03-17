@@ -34,9 +34,17 @@ class orders extends Model {
       console.log(error)
       return error
     }
-    
   }
-
+  static async payOrder (order_id, customer_id){
+    try {
+      return orders.query().update({
+      payed:true,
+    }).where("id",order_id).andWhere("customer_id",customer_id)
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []

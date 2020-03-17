@@ -7,6 +7,9 @@ const AdminModel = require('../models/admins')
 // const GroupUser = require('../models/GroupUser');
 // const User = require('../models/User')
 // const tokenKey = require('../config').secretOrKey
+const fs = require('fs')
+const EmailAdapter = require('../helpers/mailAdapter')
+const path  = require('path')
 require('dotenv').config();
 
 const customerSignup =  async function (req, res) {
@@ -21,6 +24,11 @@ const customerSignup =  async function (req, res) {
         if(findEmailAlreadyExists){
             return res.status(400).send({ status: 'failure', message: 'Email Already Exists' })
         }else{
+            try {
+                const html = fs.readFileSync(path.resolve(__dirname, 'htmlPage.html'), 'utf8').toString()
+                        .replace(/\$\{token\}/g, `http://localhost:3000`)
+            const sendMail = await EmailAdapter.send('no-reply@bStore.com', email, 'Welcome To bStore', 'Congratulations, You are now an official bStore User', html)
+
             const encrypted = bcrypt.genSaltSync(10);
             const hashedPassword = bcrypt.hashSync(req.body.password, encrypted);
             req.body.password=hashedPassword 
@@ -30,6 +38,11 @@ const customerSignup =  async function (req, res) {
             }else{
                 return res.status(400).send({ status: 'failure', message: 'Error while creating user' })
             }
+            } catch (error) {
+                console.log(error)
+                return res.status(400).send({ status: 'failure', message: 'Error while creating user' , error:error })
+            }
+            
         }
     }
 }

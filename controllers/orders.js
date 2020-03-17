@@ -174,10 +174,44 @@ const cancelOrder = async (req,res) => {
         return res.status(401).send({ status: 'failure', message: 'Error occurred while cancelling order' })
     }
 }
+const payOrder = async (req,res) => {
+    var valid_params = req.params
+    if(!valid_params){
+        return res.status(400).send({ status: 'failure', message: 'Order payment paramters are missing' });
+    }
+    const checkIfCustomer = await CustomerModel.getCustomerById(req.id)
+    if(!checkIfCustomer){
+        return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
+    }
+    if(checkIfCustomer.deleted){
+        return res.status(403).send({ status: 'failure', message: 'your account is deactivated' });
+    }
+    try {
+        const findOrder = await OrderModel.getSingleOrder(req.params.order_id,checkIfCustomer.id)
+        if(!findOrder){
+            return res.status(401).send({ status: 'failure', message: 'Order not found' });
+        }
+        if( findOrder.payed ){
+            return res.status(401).send({ status: 'failure', message: 'Order is already payed' });
+        }
+        if( findOrder.cancelled ){
+            return res.status(401).send({ status: 'failure', message: 'Order is already cancelled' });
+        }
+        const payOrder = await OrderModel.payOrder(req.params.order_id,checkIfCustomer.id)
+        if(!payOrder){
+            return res.status(400).send({ status: 'failure', message: 'Error while paying order' })
+        }
+        return res.status(200).send({ status: 'success', message:"Order payed successfully" });
+    } catch (error) {
+        console.log(error)
+        return res.status(401).send({ status: 'failure', message: 'Error occurred while paying order' ,error:error })
+    }
+}
 module.exports = {
     createOrder,
     getAllOrders,
     getCustomersOrders,
     getCustomerSingleOrder,
-    cancelOrder
+    cancelOrder,
+    payOrder
 }
