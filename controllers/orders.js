@@ -12,6 +12,9 @@ const OrderModel = require('../models/orders')
 const AdminModel = require('../models/admins')
 const ProductModel = require('../models/products')
 const OrderProducts = require('../models/order_products')
+const fs = require('fs')
+const EmailAdapter = require('../helpers/mailAdapter')
+const path  = require('path')
 require('dotenv').config();
 
 const createOrder =  async function (req, res) {
@@ -206,6 +209,10 @@ const payOrder = async (req,res) => {
         const payOrder = await OrderModel.payOrder(req.params.order_id,checkIfCustomer.id)
         if(!payOrder){
             return res.status(400).send({ status: 'failure', message: 'Error while paying order' })
+        }else{
+            const email = checkIfCustomer.email
+            const html = fs.readFileSync(path.resolve(__dirname, '../emails/paymentEmail.html'), 'utf8').toString()
+            const sendMail = await EmailAdapter.send('no-reply@bStore.com', email, 'Order Payment Notification', 'Congratulations, you payed for your order', html)
         }
         return res.status(200).send({ status: 'success', message:"Order payed successfully" });
     } catch (error) {
