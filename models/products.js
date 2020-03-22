@@ -56,23 +56,47 @@ class products extends Model {
   }
 
   static async decrementProductStock (productsArray) {
-    var edits = await Promise.all([productsArray.map(async originalProduct=>{
-      var decrements = await products.query().update({
-        stock:originalProduct.stock-1
-      }).where('id','=',originalProduct.id).andWhere("name","=",originalProduct.name)
-      return decrements
-    })])
+    const edits = await productsArray.reduce( async (previousPromise, originalProduct) => {
+      await previousPromise;
+      var find = await products.query().findOne({
+        id:originalProduct.id,
+      })
+      console.log("find",originalProduct.id,find.stock)
+      var decrement = await find.$query().updateAndFetch({
+        stock:find.stock-originalProduct.count
+      })
+      return decrement
+    }, Promise.resolve());
     return edits
+    /////////////
+    // var edits = await Promise.all([productsArray.map(async originalProduct=>{
+    //   var find = await products.query().findOne({
+    //     id:originalProduct.id,
+    //     name:originalProduct.name
+    //   })
+    //   console.log("find",originalProduct.id,find.stock)
+    //   var decrement = await find.$query().updateAndFetch({
+    //     stock:find.stock-1
+    //   })
+    //   return decrement
+    // })])
+    // return edits
+    
   }
 
   static async restoreItems (productsArray) {
     try {
-      var edits = await Promise.all([productsArray.map(async singleProduct=>{
-      var increments = await products.query().update({
-        stock:singleProduct.product.stock+1
-      }).where('id','=',singleProduct.product_id).andWhere("name","=",singleProduct.product.name)
-      return increments
-    })])
+      var edits = await Promise.all([productsArray.map(async (productsCount,index)=>{
+        if(productsCount){
+          var find = await products.query().findOne({
+            id:index,
+          })
+          var increment = await find.$query().updateAndFetch({
+            stock:find.stock+productsCount
+          })
+          return increment
+        }
+      })])
     return edits
     } catch (error) {
       console.log(error)

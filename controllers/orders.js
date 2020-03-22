@@ -30,11 +30,12 @@ const createOrder =  async function (req, res) {
             var itemUnavailable = false 
             var products = []
             var priceSum = 0
-            var checkItems = await Promise.all( req.body.products.map(async (product_id)=>{
-                var productObject = await ProductModel.getProductById(product_id)
-                priceSum += productObject.price
-                products.push(productObject)
-                if(productObject.stock<=0){
+            var checkItems = await Promise.all( req.body.products.map(async (productObj,index)=>{
+                console.log("index",index,productObj)
+                var productObject = await ProductModel.getProductById(productObj.id)
+                priceSum += productObject.price * productObj.count
+                products.push(productObj)
+                if( (productObject.stock-productObj.count) <=0 ){
                     itemUnavailable = true
                 }
                 return productObject
@@ -57,10 +58,8 @@ const createOrder =  async function (req, res) {
                     else{
                         return res.status(401).send({ status: 'failure', message: 'Error occured in order creation'  })
                     }
-
                 }
             }
-            
         }catch(err){
             console.log(err)
             return res.status(400).send({ status: 'failure', message: 'Error occured in order creation' , err: err })
@@ -155,20 +154,27 @@ const cancelOrder = async (req,res) => {
         const cancelOrder = await OrderModel.cancelOrder(req.params.order_id,checkIfCustomer.id)
         if(!cancelOrder){
             return res.status(400).send({ status: 'failure', message: 'Error while cancelling order' })
-            return res.status(200).send({ status: 'success', message:"Order cancelled successfully", data: cancelOrder });
         }
         const  orderItems = await OrderProducts.getOrderProducts(req.params.order_id)    
         if(!orderItems){
             return res.status(401).send({ status: 'failure', message: 'Error occurred while fetching order products' });
         }
-        const restoreItemsStock = await ProductModel.restoreItems(orderItems)
+        var productAndCounts = []
+        orderItems.forEach(item=>{
+            if(productAndCounts[item.product_id]){
+                productAndCounts[item.product_id]++
+            }else{
+                productAndCounts[item.product_id]=1
+            }
+        })
+        const restoreItemsStock = await ProductModel.restoreItems(productAndCounts)
         if(!restoreItemsStock){
             return res.status(401).send({ status: 'failure', message: 'Error occurred while restoring product stocks' });
         }
         if(restoreItemsStock.state && restoreItemsStock.state=="failure"){
             return res.status(401).send({ status: 'failure', message: 'Error occurred while restoring product stocks error' });
         }   
-        return res.status(200).send({ status: 'success', message:"Order cancelled successfully" });
+        return res.status(200).send({ status: 'success', message:"Order cancelled successfully",data:productAndCounts });
     } catch (error) {
         console.log(error)
         return res.status(401).send({ status: 'failure', message: 'Error occurred while cancelling order' })

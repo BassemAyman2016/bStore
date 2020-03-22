@@ -4,6 +4,9 @@ const bcrypt = require('bcryptjs');
 // const Group = require('../models/Group');
 const CustomerModel = require('../models/customers')
 const AdminModel = require('../models/admins')
+const OrdersModel = require('../models/orders')
+const OrderProductsModel = require('../models/order_products')
+const ProductModel = require('../models/products')
 // const GroupUser = require('../models/GroupUser');
 // const User = require('../models/User')
 // const tokenKey = require('../config').secretOrKey
@@ -24,25 +27,24 @@ const customerSignup =  async function (req, res) {
         if(findEmailAlreadyExists){
             return res.status(400).send({ status: 'failure', message: 'Email Already Exists' })
         }else{
-            try {
-                const html = fs.readFileSync(path.resolve(__dirname, 'htmlPage.html'), 'utf8').toString()
-                        .replace(/\$\{token\}/g, `http://localhost:3000`)
-            const sendMail = await EmailAdapter.send('no-reply@bStore.com', email, 'Welcome To bStore', 'Congratulations, You are now an official bStore User', html)
-
+            
             const encrypted = bcrypt.genSaltSync(10);
             const hashedPassword = bcrypt.hashSync(req.body.password, encrypted);
             req.body.password=hashedPassword 
             const newCustomer = await CustomerModel.createCustomer(req.body);
             if(newCustomer){
+                try{
+                const html = fs.readFileSync(path.resolve(__dirname, '../emails/htmlPage.html'), 'utf8').toString()
+                        .replace(/\$\{token\}/g, `http://localhost:3000/api/customers/confirm/`+newCustomer.id)
+                const sendMail = await EmailAdapter.send('no-reply@bStore.com', email, 'Welcome To bStore', 'Congratulations, You are now an official bStore User', html)
+                } catch (error) {
+                    const removeUser = await CustomerModel.deleteCustomer(newCustomer.id)
+                    return res.status(400).send({ status: 'failure', message: 'Error while creating user' , error:error })
+                }
                 return res.status(200).send({ status: 'success', message: 'User created successfully', data: newCustomer });
             }else{
                 return res.status(400).send({ status: 'failure', message: 'Error while creating user' })
             }
-            } catch (error) {
-                console.log(error)
-                return res.status(400).send({ status: 'failure', message: 'Error while creating user' , error:error })
-            }
-            
         }
     }
 }
@@ -83,7 +85,7 @@ const editProfile = async (req,res) => {
         if(!valid_params){
             return res.status(400).send({ status: 'failure', message: 'Edit Paramters are missing' });    
         }
-        const checkIfUserExists = await Customer.findOne({ _id : req.id })
+        const checkIfUserExists = await CustomerModel.getCustomerById( req.id)
         if(!checkIfUserExists){
             return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
         }else{
@@ -98,10 +100,9 @@ const editProfile = async (req,res) => {
             }
             if(req.body.address) editObject.address = req.body.address
             if(req.body.phone_number) editObject.phone_number = req.body.phone_number
-            console.log("editObject",editObject)
-            const updateUserData = await Customer.findOneAndUpdate({_id: checkIfUserExists._id} , editObject)
+            const updateUserData = await CustomerModel.updateCustomerData(checkIfUserExists.id , editObject)
             if(updateUserData){
-                res.status(200).send({ status: 'success', message: 'Profile edited successfully', data: updateUserData });
+                res.status(200).send({ status: 'success', message: 'Profile edited successfully' });
             }else{
                 return res.status(400).send({ status: 'failure', message: 'Error while editing profile' })
             }
@@ -111,42 +112,79 @@ const editProfile = async (req,res) => {
         return res.status(400).send({ status: 'failure', message: 'Error occurred while fetching user information' })
     }
 }
-const deleteCustomer = async (req,res) => {
+const deactivateProfile = async (req,res) => {
     const valid_params = req.params
-        if(!valid_params){
-            return res.status(400).send({ status: 'failure', message: 'Edit Paramters are missing' });    
-        }
-    const checkIfAdmin = await Admin.findOne({ _id : req.id })
-    if(!checkIfAdmin){
-        return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
+    if(!valid_params){
+        return res.status(400).send({ status: 'failure', message: 'Paramters are missing' });    
+    }
+    const userID = parseInt(req.params.user_id)
+    if(req.id !== userID){
+        return res.status(400).send({ status: 'failure', message: 'You are unauthorized to make this action' });   
+    }
+    const checkIfCustomerExists = await CustomerModel.getCustomerById(userID)
+    if(!checkIfCustomerExists){
+        return res.status(403).send({ status: 'failure', message: 'account does not exist' });
+    }
+    if(checkIfCustomerExists.deleted){
+        return res.status(400).send({ status: 'failure', message: 'Your account is already deactivated' });  
     }
     try {
-        const deleteCustomerProfile = await Customer.findOneAndUpdate({ _id: req.params.user_id}, {deleted: true});
+        const deleteCustomerProfile = await CustomerModel.deactivateAccount(userID);
         if(deleteCustomerProfile){
-            return res.status(200).send({ status: 'success', data: deleteCustomerProfile });
+            const userOrders = await OrdersModel.getCertainCustomerOrders(userID)
+            var ordersIDs = []
+            userOrders.forEach(order=>{
+                if(!order.payed && !order.cancelled){
+                    ordersIDs.push(order.id)
+                }
+            })
+            if(ordersIDs.length>0){
+                var cancelOrders = await Promise.all([ordersIDs.map(async order_id =>{
+                    return OrdersModel.cancelOrder(order_id,userID)
+                })])
+                var productIDs = []
+                const orderProductsIDs = await Promise.all( ordersIDs.map( async order_id =>{
+                    const productsHolder = await OrderProductsModel.getOrderProducts(order_id)
+                    productsHolder.forEach(product_object=>{productIDs.push(product_object.product_id)})
+                }))
+                if(productIDs.length>0){
+                    var productsAndCounts = []
+                    productIDs.forEach(id=>{
+                        if(productsAndCounts[id]){
+                            productsAndCounts[id]++
+                        }else{
+                            productsAndCounts[id]=1
+                        }
+                    })
+                    var restoreProducts = await ProductModel.restoreItems(productsAndCounts)
+                }
+            }
+            return res.status(200).send({ status: 'success', message:"Account deactivated successfully" });
         }else{
-            return res.status(400).send({ status: 'failure', message: 'Error while fetching deleting customer' })
+            return res.status(400).send({ status: 'failure', message: 'Error while deleting customer' })
         }            
     } catch (error) {
         console.log(error)
         return res.status(400).send({ status: 'failure', message: 'Error occurred while deleting customers' })
     }
 }
-const deactivateProfile = async (req,res) => {
-    const checkIfCustomerExists = await Customer.findOne({ _id : req.id , deleted:false })
-    if(!checkIfCustomerExists){
-        return res.status(403).send({ status: 'failure', message: 'your account is already deleted' });
-    }
-    try {
-        const deleteCustomerProfile = await Customer.findOneAndUpdate({ _id: req.id}, {deleted: true});
-        if(deleteCustomerProfile){
-            return res.status(200).send({ status: 'success', data: deleteCustomerProfile });
+const confirmAccount =  async function (req, res) {
+    var valid_params = req.params && req.params.id
+    if(!valid_params){
+        return res.status(400).send({ status: 'failure', message: 'Conifrmation Paramters are missing' });
+    }else{
+        const customer_id = req.params.id
+        const findCustomer = await CustomerModel.getCustomerById( customer_id );
+        if(!findCustomer || findCustomer.confirmed ||  findCustomer.deleted){
+            return res.status(400).send('<h2>Unauthorized action</h2>')
         }else{
-            return res.status(400).send({ status: 'failure', message: 'Error while fetching deleting customer' })
-        }            
-    } catch (error) {
-        console.log(error)
-        return res.status(400).send({ status: 'failure', message: 'Error occurred while deleting customers' })
+            const confirmUserAccount = await CustomerModel.confirmAccount(customer_id)
+            if(confirmUserAccount){
+                return res.status(200).send('<h1>Account confirmed successfully</h1>');
+            }else{
+                return res.status(400).send({ status: 'failure', message: 'Error while confirming user account' })
+            }
+        }
     }
 }
 module.exports = {
@@ -154,6 +192,6 @@ module.exports = {
     getAllCustomers,
     viewProfile,
     editProfile,
-    deleteCustomer,
-    deactivateProfile
+    deactivateProfile,
+    confirmAccount
 }

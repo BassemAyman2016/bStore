@@ -27,7 +27,6 @@ const Login =  async function (req, res) {
         const checkIfAdmin = await AdminModel.getAdminByEmail(email)
         if(!checkIfAdmin){
             const checkIfCustomer = await CustomerModel.getCustomerByEmail(email)
-            console.log(checkIfCustomer)
             if(!checkIfCustomer){
                 return res.status(404).send({ status: 'failure', message: 'Invalid email or password' });
             }else{
@@ -43,6 +42,8 @@ const Login =  async function (req, res) {
                         return res.status(200).send({ status: 'success', token: `bearer ${token}`, type:'customer', id: checkIfCustomer.id })
                     
                     }
+                }else{
+                    return res.status(404).send({ status: 'failure', message: 'Invalid email or password' });
                 }
             }
         }else{

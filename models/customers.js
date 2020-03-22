@@ -34,6 +34,18 @@ class customers extends Model {
   static async viewProfile(id){
     return customers.query().findOne({id}).eager('[orders]')
   }
+  static async deleteCustomer(id){
+    return customers.query().del().where('id',"=",id)
+  }
+  static async deactivateAccount(id){
+    return customers.query().patchAndFetchById(id,{deleted:true})
+  }
+  static async confirmAccount(id){
+    return customers.query().patchAndFetchById(id,{ confirmed: true})
+  }
+  static async updateCustomerData(id,data){
+    return customers.query().patchAndFetchById(id,data)
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []

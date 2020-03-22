@@ -11,13 +11,15 @@ class order_products extends Model {
   static async insertProducts(products,order){
     const productInsertions = await Promise.all([products.map(async singleProduct=>{
       var holder = []
-      const singleInsertion = await order_products.query().insertAndFetch({
-        order_id:order.id,
-        product_id:singleProduct.id
-      }).then(res=>{
-        holder.push(res)
-      })
-      return holder[0]
+      for(var i=0; i < singleProduct.count ; i++){
+        const singleInsertion = await order_products.query().insertAndFetch({
+          order_id:order.id,
+          product_id:singleProduct.id
+        }).then(res=>{
+          holder.push(res)
+        })
+      }
+      return holder
     })])
     return productInsertions
   }
