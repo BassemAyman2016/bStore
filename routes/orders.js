@@ -12,5 +12,7 @@ router.get('/getCustomerOrders',middleware.verifyToken, order.getCustomersOrders
 router.get('/getSingleOrder/:order_id',middleware.verifyToken, order.getCustomerSingleOrder);
 router.put('/cancelOrder/:order_id',middleware.verifyToken, order.cancelOrder);
 router.put('/payOrder/:order_id',middleware.verifyToken, order.payOrder);
+router.put('/adminCancelOrder/:order_id',middleware.verifyToken, order.adminCancelOrder);
+
 
 module.exports = router;

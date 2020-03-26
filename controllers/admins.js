@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 // const passport = require('passport')
 // const Group = require('../models/Group');
 const AdminModel = require('../models/admins')
+const CustomerModel = require('../models/customers')
 // const GroupUser = require('../models/GroupUser');
 // const User = require('../models/User')
 // const tokenKey = require('../config').secretOrKey

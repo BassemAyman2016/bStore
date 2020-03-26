@@ -21,6 +21,11 @@ class brands extends Model {
       return { state:"failure", error: err}
     })
   }
+  static async setDeleted(id){
+    return brands.query().update({
+      deleted:true
+    }).where("id","=",id)
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []

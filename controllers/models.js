@@ -30,7 +30,30 @@ const createModel =  async function (req, res) {
         res.status(422).send({ status: 'failure', message: 'creation of model Failed' });
     }
 }
+const deleteModel =  async function (req, res) {
+    var valid_params = req.params && req.params.model_id
+    if(!valid_params){
+        return res.status(400).send({ status: 'failure', message: 'model name is missing' });
+    }
+    const model_id = req.params.model_id
+    // const checkIfAdmin = await AdmAdminin.findOne({ _id : req.id })
+    const checkIfAdmin = await AdminModel.getAdminById(req.id)
+    if(!checkIfAdmin){
+        return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
+    }
+    const checkIfModelExists = await ModelModel.getModelById(model_id)
+    if(!checkIfModelExists){
+        return res.status(403).send({ status: 'failure', message: 'Model does not exist' });
+    }
+    const modelDeletion = await ModelModel.setDeleted(model_id)
+    if(modelDeletion){
+        res.status(200).send({ status: 'success', message: 'model deleted successfully', data: modelDeletion })
+    }else{
+        res.status(422).send({ status: 'failure', message: 'deletion of model Failed' });
+    }
+}
 
 module.exports = {
-    createModel
+    createModel,
+    deleteModel
 }

@@ -27,6 +27,20 @@ class order_products extends Model {
   static async getOrderProducts(order_id){
     return order_products.query().select("product_id").where("order_id",order_id).eager('[product]')
   }
+
+  static async fillOrdersProducts (customersData) {
+    const fill = await Promise.all( customersData.map(async customer=>{
+      const ordersFill = await Promise.all(customer.orders.map(async order=>{
+        const data = await order_products.query().select('*').where('order_id',order.id).eager('[productData]')
+        .then(res=>{
+          order.products = res
+        })
+        return order
+      }))
+      return customer
+    }))
+    return fill
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []
@@ -64,6 +78,14 @@ class order_products extends Model {
     const Product = require('./products')
     return {
       product:{
+        relation: Model.BelongsToOneRelation,
+        modelClass: Product,
+        join:{
+          from:'order_products.product_id',
+          to:'products.id'
+        }
+      },
+      productData:{
         relation: Model.BelongsToOneRelation,
         modelClass: Product,
         join:{

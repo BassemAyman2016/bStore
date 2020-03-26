@@ -35,6 +35,9 @@ const Login =  async function (req, res) {
                     if(checkIfCustomer.deleted){
                         return res.status(403).send({ status: 'failure', message: 'Account is currently deactivated request to activate your account through email' })
                     }else{
+                        if(!checkIfCustomer.confirmed){
+                            return res.status(403).send({ status: 'failure', message: 'Account is currently not confirmed , please check your email' })
+                        }
                         const payload = {
                             id: checkIfCustomer.id
                         }

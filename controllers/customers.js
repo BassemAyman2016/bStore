@@ -39,7 +39,7 @@ const customerSignup =  async function (req, res) {
                 const sendMail = await EmailAdapter.send('no-reply@bStore.com', email, 'Welcome To bStore', 'Congratulations, You are now an official bStore User', html)
                 } catch (error) {
                     const removeUser = await CustomerModel.deleteCustomer(newCustomer.id)
-                    return res.status(400).send({ status: 'failure', message: 'Error while creating user' , error:error })
+                    return res.status(400).send({ status: 'failure', message: 'Failed to create user, please make sure that the email is correct' , error:error })
                 }
                 return res.status(200).send({ status: 'success', message: 'User created successfully', data: newCustomer });
             }else{
@@ -55,8 +55,9 @@ const getAllCustomers = async (req,res) => {
     }
     try {
         const allCustomers = await CustomerModel.getAllCustomersNotDeleted();
+        const fillOrders = await OrderProductsModel.fillOrdersProducts(allCustomers)
         if(allCustomers){
-            return res.status(200).send({ status: 'success', data: allCustomers });
+            return res.status(200).send({ status: 'success', data: fillOrders  });
         }else{
             return res.status(400).send({ status: 'failure', message: 'Error while fetching customers' })
         }            

@@ -20,6 +20,7 @@ const model = require('./routes/models')
 const brand = require('./routes/brands')
 const product = require('./routes/products')
 const order = require('./routes/orders')
+const product_image = require('./routes/product_images')
 
 
 app.use(express.json())
@@ -42,6 +43,7 @@ app.use('/api/models', model)
 app.use('/api/brands', brand)
 app.use('/api/products', product)
 app.use('/api/orders', order)
+app.use('/api/product_images', product_image)
 
 const port = process.env.PORT
 app.listen(port, (req, res) => {

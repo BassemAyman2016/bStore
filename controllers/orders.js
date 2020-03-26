@@ -34,8 +34,8 @@ const createOrder =  async function (req, res) {
             var products = []
             var priceSum = 0
             var checkItems = await Promise.all( req.body.products.map(async (productObj,index)=>{
-                console.log("index",index,productObj)
                 var productObject = await ProductModel.getProductById(productObj.id)
+                if(!productObject) return res.status(400).send({ status: 'failure', message: 'Product(s) does not exist' });
                 priceSum += productObject.price * productObj.count
                 products.push(productObj)
                 if( (productObject.stock-productObj.count) <=0 ){
@@ -220,11 +220,61 @@ const payOrder = async (req,res) => {
         return res.status(401).send({ status: 'failure', message: 'Error occurred while paying order' ,error:error })
     }
 }
+const adminCancelOrder = async (req,res) => {
+    var valid_params = req.params
+    if(!valid_params){
+        return res.status(400).send({ status: 'failure', message: 'Order cancellation paramters are missing' });
+    }
+    const checkIfAdmin = await AdminModel.getAdminById(req.id)
+    if(!checkIfAdmin){
+        return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
+    }
+    try {
+        const findOrder = await OrderModel.getOrderById(req.params.order_id)
+        if(!findOrder){
+            return res.status(401).send({ status: 'failure', message: 'Order not found' });
+        }
+        if( findOrder.payed ){
+            return res.status(401).send({ status: 'failure', message: 'Order is already payed' });
+        }
+        if( findOrder.cancelled ){
+            return res.status(401).send({ status: 'failure', message: 'Order is already cancelled' });
+        }
+        const cancelOrder = await OrderModel.cancelOrder(req.params.order_id)
+        if(!cancelOrder){
+            return res.status(400).send({ status: 'failure', message: 'Error while cancelling order' })
+        }
+        const  orderItems = await OrderProducts.getOrderProducts(req.params.order_id)    
+        if(!orderItems){
+            return res.status(401).send({ status: 'failure', message: 'Error occurred while fetching order products' });
+        }
+        var productAndCounts = []
+        orderItems.forEach(item=>{
+            if(productAndCounts[item.product_id]){
+                productAndCounts[item.product_id]++
+            }else{
+                productAndCounts[item.product_id]=1
+            }
+        })
+        const restoreItemsStock = await ProductModel.restoreItems(productAndCounts)
+        if(!restoreItemsStock){
+            return res.status(401).send({ status: 'failure', message: 'Error occurred while restoring product stocks' });
+        }
+        if(restoreItemsStock.state && restoreItemsStock.state=="failure"){
+            return res.status(401).send({ status: 'failure', message: 'Error occurred while restoring product stocks error' });
+        }   
+        return res.status(200).send({ status: 'success', message:"Order cancelled successfully",data:productAndCounts });
+    } catch (error) {
+        console.log(error)
+        return res.status(401).send({ status: 'failure', message: 'Error occurred while cancelling order' })
+    }
+}
 module.exports = {
     createOrder,
     getAllOrders,
     getCustomersOrders,
     getCustomerSingleOrder,
     cancelOrder,
-    payOrder
+    payOrder,
+    adminCancelOrder
 }

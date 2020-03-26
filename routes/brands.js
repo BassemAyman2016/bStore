@@ -7,5 +7,6 @@ const brand = require('../controllers/brands');
 
 // a simple test url to check that all of our files are communicating correctly.
 router.post('/createBrand', middleware.verifyToken, brand.createBrand);
+router.delete('/deleteBrand/:brand_id', middleware.verifyToken, brand.deleteBrand);
 
 module.exports = router;

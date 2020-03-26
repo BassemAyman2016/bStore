@@ -1,7 +1,3 @@
-const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken')
-// const passport = require('passport')
-// const Group = require('../models/Group');
 const ProductModel = require('../models/products')
 const AdminModel = require('../models/admins')
 const ProductImagesModel = require('../models/prodcut_images')
@@ -11,48 +7,30 @@ const CategoryModel = require('../models/categories')
 // const tokenKey = require('../config').secretOrKey
 require('dotenv').config();
 
-const createProduct =  async function (req, res) {
-    var valid_params = req.body &&
-    req.body.name && req.body.description && req.body.brand_id && req.body.model_id &&
-    req.body.price && req.body.category_id && req.body.stock && req.body.images
+const deleteProductImages =  async function (req, res) {
+    var product_id = req.params.product_id
+
+    if(!product_id){
+        return res.status(400).send({ status: 'failure', message: 'Product images deletion paramters are missing' });
+    }
     const checkIfAdmin = await AdminModel.getAdminById(req.id)
     if(!checkIfAdmin){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
-    const checkIfCategoryExists = await CategoryModel.getCategoryById(req.body.category_id)
-    if(!checkIfCategoryExists){
-        return res.status(403).send({ status: 'failure', message: 'category not found' });
+    const checkIfProductExists = await ProductModel.getProductById(product_id)
+    if(!checkIfProductExists){
+        return res.status(403).send({ status: 'failure', message: 'Product does not exist' });
     }
-    const checkIfBrandExists = await BrandModel.getBrandById(req.body.brand_id)
-    if(!checkIfBrandExists){
-        return res.status(403).send({ status: 'failure', message: 'brand not found' });
+    if(checkIfProductExists.deleted){
+        return res.status(403).send({ status: 'failure', message: 'Product is already deleted' });
     }
-    const checkIfModelExists = await ModelModel.getModelById(req.body.model_id)
-    if(!checkIfModelExists){
-        return res.status(403).send({ status: 'failure', message: 'model not found' });
-    }
-    if(!valid_params){
-        return res.status(400).send({ status: 'failure', message: 'Product creation paramters are missing' });
+    const deleteALLProductImages = await ProductImagesModel.setDeleted(product_id);
+    if(deleteALLProductImages){
+        return res.status(200).send({ status: 'success', message: 'Product images deleted successfully' });
     }else{
-        const name = req.body.name
-        // const findIfProductWithSameNameExists = await ProductModel.findOne({ 'name': name });
-        const findIfProductWithSameNameExists = await ProductModel.getProductByName(name);
-        if(findIfProductWithSameNameExists){
-            return res.status(400).send({ status: 'failure', message: 'Product already exists' })
-        }else{
-            const newProduct = await ProductModel.createProduct(req.body);
-            if(newProduct){
-                const insertProductImages = ProductImagesModel.insertProductImages(req.body.images, newProduct.id)
-                if(insertProductImages){
-                    return res.status(200).send({ status: 'success', message: 'Product created successfully', data: newProduct });
-                }else{
-                    return res.status(400).send({ status: 'failure', message: 'Error while creating product images' })    
-                }
-            }else{
-                return res.status(400).send({ status: 'failure', message: 'Error while creating product' })
-            }
-        }
+        return res.status(400).send({ status: 'failure', message: 'Error occured while deleting images' })
     }
+    
 }
 const getAllProducts = async function (req, res) {
     const allProducts = await ProductModel.getAllProducts()
@@ -136,9 +114,39 @@ const deleteProduct =  async function (req, res) {
         
     }
 }
+const insertProductImage = async function(req,res) {
+        var product_id = req.params.product_id
+        var imageContainer = req.body.img
+        if(!product_id || !imageContainer){
+            return res.status(400).send({ status: 'failure', message: 'Product image insertion paramters are missing' });
+        }
+        const checkIfAdmin = await AdminModel.getAdminById(req.id)
+        if(!checkIfAdmin){
+            return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
+        }
+        const checkIfProductExists = await ProductModel.getProductById(product_id)
+        if(!checkIfProductExists){
+            return res.status(403).send({ status: 'failure', message: 'Product does not exist' });
+        }
+        if(checkIfProductExists.deleted){
+            return res.status(403).send({ status: 'failure', message: 'Product is already deleted' });
+        }
+        if(typeof imageContainer == "string"){
+            const insertSingleImage = await ProductImagesModel.insertProductImages([imageContainer],product_id)
+            if(!insertSingleImage){
+                return res.status(403).send({ status: 'failure', message: 'Error in image insertion' });
+            }
+        }
+        if(imageContainer instanceof Array){
+            const insertMultipleImages = await ProductImagesModel.insertProductImages(imageContainer,product_id)
+            if(!insertMultipleImages){
+                return res.status(403).send({ status: 'failure', message: 'Error in image insertions' });
+            }
+        }
+        return res.status(200).send({ status: 'success', message: 'Product images inserted successfully' })      
+    
+}
 module.exports = {
-    createProduct,
-    getAllProducts,
-    editProduct,
-    deleteProduct
+    deleteProductImages,
+    insertProductImage
 }

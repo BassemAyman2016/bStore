@@ -11,6 +11,9 @@ class orders extends Model {
   static async getAllOrders(){
     return orders.query().select('*').eager('[Customer,products]')
   }
+  static async getOrderById(id){
+    return orders.query().select('*').where('id',id).eager('[products]')
+  }
   static async getCertainCustomerOrders(id){
     return orders.query().select('*').where("customer_id",id).eager('[products]')
   }
@@ -45,6 +48,17 @@ class orders extends Model {
       return error
     }
   }
+  static async adminCancelOrder (order_id){
+    try {
+      return orders.query().update({
+      cancelled:true,
+    }).where("id",order_id)
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+  }
+
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []
