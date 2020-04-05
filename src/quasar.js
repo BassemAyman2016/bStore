@@ -23,7 +23,15 @@ import {
   QList,
   QItem,
   QItemSection,
-  QItemLabel
+  QItemLabel,
+  AddressbarColor,
+  QAvatar,
+  Loading,
+  LoadingBar,
+  QCard,
+  QCardSection,
+  QCardActions,
+  QImg
 } from "quasar";
 
 Vue.use(Quasar, {
@@ -41,9 +49,18 @@ Vue.use(Quasar, {
     QList,
     QItem,
     QItemSection,
-    QItemLabel
+    QItemLabel,
+    QAvatar,
+    QCard,
+    QCardSection,
+    QCardActions,
+    QImg
   },
   directives: {},
-  plugins: {},
+  plugins: {
+    Loading,
+    LoadingBar,
+    AddressbarColor
+  },
   iconSet: iconSet
 });

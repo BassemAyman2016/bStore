@@ -1,6 +1,6 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated class="glossy">
+  <q-layout view="lhh lpR lff">
+    <q-header reveal elevated class="bg-primary ">
       <q-toolbar>
         <q-btn
           flat
@@ -10,14 +10,21 @@
           aria-label="Menu"
           icon="fas fa-bars"
         />
-
+        <q-avatar>
+          <img style="height:30px;" src="./assets/iconOnly.png" />
+        </q-avatar>
         <q-toolbar-title>
           bStore App
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" bordered content-class="bg-grey-2">
+    <q-drawer
+      v-model="leftDrawerOpen"
+      bordered
+      content-class="bg-grey-2"
+      behavior="mobile"
+    >
       <q-list>
         <q-item-label header>Essential Links</q-item-label>
         <q-item clickable tag="a" target="_blank" href="https://quasar.dev">
@@ -89,25 +96,26 @@
     </q-drawer>
 
     <q-page-container>
-      <HelloWorld />
+      <router-view></router-view>
     </q-page-container>
   </q-layout>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+// import HelloWorld from "./components/HelloWorld.vue";
 
 export default {
   name: "LayoutDefault",
 
-  components: {
-    HelloWorld
-  },
+  components: {},
 
   data() {
     return {
       leftDrawerOpen: false
     };
+  },
+  created() {
+    this.$q.addressbarColor.set("#ff0000");
   }
 };
 </script>
