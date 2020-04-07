@@ -1,4 +1,7 @@
 import axios from "axios";
+import { Loading } from "quasar";
+
+// default options
 // import store from "./index";
 export default () => {
   var apiObject = axios.create({
@@ -8,27 +11,27 @@ export default () => {
       Authorization: sessionStorage.getItem("accessToken")
     }
   });
-  //   apiObject.interceptors.request.use(
-  //     config => {
-  //       store.commit("setSpinnerStatus", true);
-  //       return config;
-  //     },
-  //     error => {
-  //       store.commit("setSpinnerStatus", false);
-  //       return Promise.reject(error);
-  //     }
-  //   );
+  apiObject.interceptors.request.use(
+    config => {
+      Loading.show();
+      return config;
+    },
+    error => {
+      Loading.hide();
+      return Promise.reject(error);
+    }
+  );
 
-  //   apiObject.interceptors.response.use(
-  //     response => {
-  //       store.commit("setSpinnerStatus", false);
-  //       return response;
-  //     },
-  //     error => {
-  //       store.commit("setSpinnerStatus", false);
-  //       return Promise.reject(error);
-  //     }
-  //   );
+  apiObject.interceptors.response.use(
+    response => {
+      Loading.hide();
+      return response;
+    },
+    error => {
+      Loading.hide();
+      return Promise.reject(error);
+    }
+  );
 
   return apiObject;
 };

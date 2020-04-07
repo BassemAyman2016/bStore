@@ -31,7 +31,9 @@ import {
   QCard,
   QCardSection,
   QCardActions,
-  QImg
+  QImg,
+  QForm,
+  QInput
 } from "quasar";
 
 Vue.use(Quasar, {
@@ -54,7 +56,9 @@ Vue.use(Quasar, {
     QCard,
     QCardSection,
     QCardActions,
-    QImg
+    QImg,
+    QForm,
+    QInput
   },
   directives: {},
   plugins: {
