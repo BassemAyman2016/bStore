@@ -57,7 +57,7 @@ const createProduct =  async function (req, res) {
 const getAllProducts = async function (req, res) {
     const allProducts = await ProductModel.getAllProducts()
     if(allProducts){
-        return res.status(200).send({ status:"succes", data:allProducts })
+        return res.status(200).send({ status:"success", data:allProducts })
     }else{
         return res.status(400).send({ status: 'failure', message: 'error occured' })
     }
