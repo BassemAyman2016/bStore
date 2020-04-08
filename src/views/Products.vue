@@ -96,9 +96,6 @@ export default {
     clicked() {
       this.animation = !this.animation;
       this.$forceUpdate();
-      // LoadingBar.start();
-
-      // LoadingBar.stop();
       this.showLoading();
     },
     showLoading() {
