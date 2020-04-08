@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Loading } from "quasar";
-
+import store from "./index";
 // default options
 // import store from "./index";
 export default () => {
@@ -8,7 +8,7 @@ export default () => {
     baseURL: process.env.VUE_APP_API_URL,
     headers: {
       // eslint-disable-next-line no-undef
-      Authorization: sessionStorage.getItem("accessToken")
+      Authorization: store.getters.getToken
     }
   });
   apiObject.interceptors.request.use(

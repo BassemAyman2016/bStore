@@ -33,7 +33,8 @@ import {
   QCardActions,
   QImg,
   QForm,
-  QInput
+  QInput,
+  Notify
 } from "quasar";
 
 Vue.use(Quasar, {
@@ -64,7 +65,8 @@ Vue.use(Quasar, {
   plugins: {
     Loading,
     LoadingBar,
-    AddressbarColor
+    AddressbarColor,
+    Notify
   },
   iconSet: iconSet
 });

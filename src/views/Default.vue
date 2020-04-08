@@ -10,6 +10,7 @@
             @click="leftDrawerOpen = !leftDrawerOpen"
             aria-label="Menu"
             icon="fas fa-bars"
+            v-if="isAdmin"
           />
           <q-toolbar-title class="title-head" shrink>
             <q-avatar>
@@ -18,16 +19,24 @@
             bStore App
           </q-toolbar-title>
         </div>
-        <div class="col-shrink">
+        <div class="col-shrink" v-if="isLoggedIn">
+          <q-icon
+            name="account_circle"
+            style="font-size: 2rem;"
+            class="mouseHover"
+            @click="logout"
+          />
+        </div>
+        <div class="col-shrink" v-else>
           <div
-            class="text-body1 header-text q-mx-sm"
+            class="text-body1 header-text q-mx-xs"
             @click="changeRoute('Login')"
           >
             Login
           </div>
           or
           <div
-            class="text-body1 header-text q-mx-sm"
+            class="text-body1 header-text q-mx-xs"
             @click="changeRoute('Register')"
           >
             Register
@@ -131,10 +140,22 @@ export default {
   methods: {
     changeRoute(routeName) {
       this.$router.push({ name: routeName });
+    },
+    logout() {
+      this.$store.commit("logout");
     }
   },
   created() {
     this.$q.addressbarColor.set("#ff0000");
+  },
+  computed: {
+    isAdmin() {
+      const userType = this.$store.getters.getUserType;
+      return userType == "admin";
+    },
+    isLoggedIn() {
+      return this.$store.getters.getToken;
+    }
   }
 };
 </script>
@@ -147,10 +168,16 @@ export default {
   }
 }
 .header-text {
+  font-size: 16px;
   display: inline;
   &:hover {
     cursor: pointer;
     color: rgb(209, 205, 205);
+  }
+}
+.mouseHover {
+  &:hover {
+    cursor: pointer;
   }
 }
 </style>
