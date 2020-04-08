@@ -29,12 +29,30 @@ const routes = [
   {
     path: "/login",
     name: "Login",
-    component: () => import("../views/Login")
+    component: () => import("../views/User/Login")
   },
   {
     path: "/register",
     name: "Register",
-    component: () => import("../views/Register")
+    component: () => import("../views/User/Register")
+  },
+  {
+    path: "/resetPassword/:token",
+    name: "ResetPassword",
+    props: true,
+    component: () => import("../views/User/ResetPassword.vue")
+  },
+  {
+    path: "/resetPasswordRequest",
+    name: "ResetPasswordRequest",
+    props: true,
+    component: () => import("../views/User/ResetPasswordRequest.vue")
+  },
+  {
+    path: "/confirmAccount/:user_id",
+    name: "ConfirmAccount",
+    props: true,
+    component: () => import("../views/User/ConfirmAccount.vue")
   }
 ];
 

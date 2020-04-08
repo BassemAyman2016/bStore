@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import api from "../store/api";
+// import api from "../store/api";
 // import axios from "axios";
 export default {
   name: "Products",
@@ -84,14 +84,14 @@ export default {
     };
   },
   methods: {
-    async getProducts() {
-      await api()
-        .get(`products/getallProducts`)
-        .then(res => {
-          if (res.data.status == "success") {
-            this.products = res.data.data;
-          }
-        });
+    async getData() {
+      await Promise.all([
+        this.$store.dispatch("fetchProducts"),
+        this.$store.dispatch("fetchCategories"),
+        this.$store.dispatch("fetchBrands"),
+        this.$store.dispatch("fetchModels")
+      ]);
+      this.products = this.$store.getters.getProducts;
     },
     clicked() {
       this.animation = !this.animation;
@@ -112,7 +112,7 @@ export default {
     }
   },
   created() {
-    this.getProducts();
+    this.getData();
   },
   computed: {
     QuasarObj() {

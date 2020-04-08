@@ -3,35 +3,34 @@
     <div class="col q-pa-lg">
       <div class="row justify-center">
         <q-card class="shadow-24 animated rollIn login-card col-xs-10 col-md-3">
-          <q-card-section class="bg-indigo-7">
+          <q-card-section class="bg-green-8">
             <div class="text-h5 text-white q-my-md" style="text-align:center;">
-              Login
+              Reset Password
             </div>
           </q-card-section>
           <q-card-section>
             <q-form class="q-px-sm q-pt-md">
               <q-input
-                ref="email"
+                ref="new"
                 square
                 clearable
-                v-model="email"
-                type="email"
-                label="Email"
+                v-model="newPass"
+                type="password"
+                label="New Password"
                 :rules="[val => !!val || 'Field is required']"
               >
                 <template v-slot:prepend>
-                  <q-icon name="email" />
+                  <q-icon name="lock" />
                 </template>
               </q-input>
               <q-input
-                ref="password"
+                ref="confirmPass"
                 square
                 clearable
-                v-model="password"
+                v-model="confirmPass"
                 type="password"
-                label="Password"
+                label="Confirm Password"
                 :rules="[val => !!val || 'Field is required']"
-                @keyup.enter="singInClicked"
               >
                 <template v-slot:prepend>
                   <q-icon name="lock" />
@@ -39,19 +38,16 @@
               </q-input>
             </q-form>
           </q-card-section>
-          <q-card-actions class="q-px-lg">
+          <q-card-actions class="q-px-lg q-mb-md">
             <q-btn
               unelevated
               size="lg"
-              color="indigo-4"
+              color="green-4"
               class="full-width text-white"
-              label="Sign In"
-              @click="singInClicked"
+              label="Submit"
+              @click="submitRequest"
             />
           </q-card-actions>
-          <q-card-section class="text-center q-pa-sm">
-            <p class="text-grey-6 mouseHover">Forgot your password?</p>
-          </q-card-section>
         </q-card>
       </div>
     </div>
@@ -59,18 +55,24 @@
 </template>
 
 <script>
-import api from "../store/api";
+import api from "../../store/api";
 export default {
   name: "Login",
+  props: {
+    token: {
+      required: false,
+      default: ""
+    }
+  },
   data() {
     return {
-      email: null,
-      password: null
+      newPass: null,
+      confirmPass: null
     };
   },
   methods: {
-    async singInClicked() {
-      if (!this.email || !this.password) {
+    async submitRequest() {
+      if (!this.newPass || !this.confirmPass) {
         this.$q.notify({
           position: "bottom",
           type: "negative",
@@ -79,22 +81,26 @@ export default {
         });
       } else {
         var apiObject = {
-          email: this.email,
-          password: this.password
+          password: this.newPass
         };
+        if (this.newPass !== this.confirmPass) {
+          this.$q.notify({
+            type: "warning",
+            timeout: "1500",
+            message: `Passwords written do not match`
+          });
+          return;
+        }
         await api()
-          .post("sessions/login", apiObject)
+          .post(`sessions/resetPassword/${this.token}`, apiObject)
           .then(res => {
             const response = res.data;
             this.$q.notify({
               position: "bottom",
               type: "positive",
               timeout: "2000",
-              message: "Logged in successfully"
+              message: response.message
             });
-            this.$store.commit("setUserId", response.id);
-            this.$store.commit("setUserType", response.type);
-            this.$store.commit("setToken", response.token);
             setTimeout(() => {
               this.$router.push({ name: "Products" });
             }, 1500);
@@ -115,7 +121,7 @@ export default {
 
 <style lang="scss" scoped>
 .login {
-  background: linear-gradient(#1467ba, rgb(204, 202, 202));
+  background: linear-gradient(#14ba38, rgb(204, 202, 202));
 }
 .login-card {
   // width: 300px;
