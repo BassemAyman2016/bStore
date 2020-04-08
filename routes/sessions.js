@@ -7,5 +7,7 @@ const session = require('../controllers/sessions');
 
 // a simple test url to check that all of our files are communicating correctly.
 router.post('/login', session.Login);
+router.post('/requestPasswordReset', session.requestPasswordReset);
+router.post('/resetPassword/:token', session.resetPassword);
 
 module.exports = router;

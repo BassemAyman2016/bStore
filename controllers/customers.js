@@ -13,6 +13,7 @@ const ProductModel = require('../models/products')
 const fs = require('fs')
 const EmailAdapter = require('../helpers/mailAdapter')
 const path  = require('path')
+const crypto = require('crypto')
 require('dotenv').config();
 
 const customerSignup =  async function (req, res) {
@@ -33,8 +34,9 @@ const customerSignup =  async function (req, res) {
             const newCustomer = await CustomerModel.createCustomer(req.body);
             if(newCustomer){
                 try{
+                const frontEndLink = process.env.FRONTEND_URL
                 const html = fs.readFileSync(path.resolve(__dirname, '../emails/htmlPage.html'), 'utf8').toString()
-                        .replace(/\$\{token\}/g, `http://localhost:3000/api/customers/confirm/`+newCustomer.id)
+                        .replace(/\$\{token\}/g, `${frontEndLink}/confirmAccount/`+newCustomer.id)
                 const sendMail = await EmailAdapter.send('no-reply@bStore.com', email, 'Welcome To bStore', 'Congratulations, You are now an official bStore User', html)
                 } catch (error) {
                     const removeUser = await CustomerModel.deleteCustomer(newCustomer.id)
@@ -175,18 +177,25 @@ const confirmAccount =  async function (req, res) {
     }else{
         const customer_id = req.params.id
         const findCustomer = await CustomerModel.getCustomerById( customer_id );
-        if(!findCustomer || findCustomer.confirmed ||  findCustomer.deleted){
-            return res.status(400).send('<h2>Unauthorized action</h2>')
-        }else{
+        if(!findCustomer){
+            return res.status(400).send({ status: 'failure', message: 'Unauthorized Action' })
+        }
+        if(findCustomer.confirmed){
+            return res.status(400).send({ status: 'failure', message: 'Account already confirmed' })
+        }
+        if(findCustomer.deleted){
+            return res.status(400).send({ status: 'failure', message: 'Account deleted' })
+        }
             const confirmUserAccount = await CustomerModel.confirmAccount(customer_id)
             if(confirmUserAccount){
-                return res.status(200).send('<h1>Account confirmed successfully</h1>');
+                return res.status(200).send({ status: 'failure', message: 'Account activated successfully ! Please login.' });
             }else{
                 return res.status(400).send({ status: 'failure', message: 'Error while confirming user account' })
             }
-        }
+        
     }
 }
+
 module.exports = {
     customerSignup,
     getAllCustomers,

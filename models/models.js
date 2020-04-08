@@ -26,6 +26,9 @@ class models extends Model {
       deleted:true
     }).where("id","=",id)
   }
+  static async getAllModels(){
+    return models.query().select('*').where('deleted','=',false)
+  }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {
 //       var addTours = []

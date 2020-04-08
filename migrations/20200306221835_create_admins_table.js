@@ -5,6 +5,7 @@ exports.up = knex =>
     table.string("password", 100)
     table.string("first_name", 100)
     table.string("last_name", 100)
+    table.string("reset_token", 100)
   });
 
 exports.down = knex => knex.schema.dropTableIfExists("admins");

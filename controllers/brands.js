@@ -52,8 +52,18 @@ const deleteBrand =  async function (req, res) {
         res.status(422).send({ status: 'failure', message: 'creation of brand Failed' });
     }
 }
+const getBrands =  async function (req, res) {
+    
+    const fetchBrands = await BrandModel.getAllBrands()
+    if(fetchBrands){
+        res.status(200).send({ status: 'success',  data: fetchBrands })
+    }else{
+        res.status(422).send({ status: 'failure', message: 'error while fetching brands' });
+    }
+}
 
 module.exports = {
     createBrand,
-    deleteBrand
+    deleteBrand,
+    getBrands
 }

@@ -52,8 +52,18 @@ const deleteCategory =  async function (req, res) {
         res.status(422).send({ status: 'failure', message: 'deletion of category Failed' });
     }
 }
+const getCategories =  async function (req, res) {
+    
+    const fetchBrands = await CategoryModel.getAllCategories()
+    if(fetchBrands){
+        res.status(200).send({ status: 'success',  data: fetchBrands })
+    }else{
+        res.status(422).send({ status: 'failure', message: 'error while fetching categories' });
+    }
+}
 
 module.exports = {
     createCategory,
-    deleteCategory
+    deleteCategory,
+    getCategories
 }

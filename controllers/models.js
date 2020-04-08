@@ -52,8 +52,16 @@ const deleteModel =  async function (req, res) {
         res.status(422).send({ status: 'failure', message: 'deletion of model Failed' });
     }
 }
-
+const getModels =  async function (req, res) {
+    const fetchedData = await ModelModel.getAllModels()
+    if(fetchedData){
+        res.status(200).send({ status: 'success',  data: fetchedData })
+    }else{
+        res.status(422).send({ status: 'failure', message: 'error while fetching categories' });
+    }
+}
 module.exports = {
     createModel,
-    deleteModel
+    deleteModel,
+    getModels
 }

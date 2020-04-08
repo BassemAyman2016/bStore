@@ -9,6 +9,7 @@ exports.up = knex =>
     table.string("phone_number", 100)
     table.boolean("deleted")
     table.boolean("confirmed")
+    table.string("reset_token", 100)
 });
 
 exports.down = knex => knex.schema.dropTableIfExists("customers");

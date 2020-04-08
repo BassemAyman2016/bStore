@@ -16,6 +16,9 @@ class customers extends Model {
   static getCustomerByEmail (email) {
     return customers.query().findOne({email: email})
   }
+  static async getCustomerByResetToken (token) {
+    return customers.query().findOne({reset_token: token})
+  }
   static async createCustomer(body) {
     return customers.query().insertAndFetch({
       first_name: body.first_name,
@@ -45,6 +48,25 @@ class customers extends Model {
   }
   static async updateCustomerData(id,data){
     return customers.query().patchAndFetchById(id,data)
+  }
+  static async insertResetToken(email,token){
+    var find = await customers.query().findOne({
+      email
+    })
+    var insert = await find.$query().updateAndFetch({
+      reset_token:token
+    })
+    return insert
+  }
+  static async updatePassword(id,newPassword){
+    var find = await customers.query().findOne({
+      id
+    })
+    var insert = await find.$query().updateAndFetch({
+      reset_token:null,
+      password:newPassword
+    })
+    return insert
   }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {

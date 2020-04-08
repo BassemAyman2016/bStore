@@ -11,5 +11,6 @@ router.get('/getAllCustomers',middleware.verifyToken, customer.getAllCustomers);
 router.get('/viewProfile',middleware.verifyToken, customer.viewProfile);
 router.put('/editProfile',middleware.verifyToken, customer.editProfile);
 router.delete('/deactivateProfile/:user_id',middleware.verifyToken, customer.deactivateProfile);
-router.get('/confirm/:id', customer.confirmAccount);
+router.post('/confirm/:id', customer.confirmAccount);
+
 module.exports = router;
