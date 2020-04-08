@@ -27,7 +27,6 @@ const customerSignup =  async function (req, res) {
         if(findEmailAlreadyExists){
             return res.status(400).send({ status: 'failure', message: 'Email Already Exists' })
         }else{
-            
             const encrypted = bcrypt.genSaltSync(10);
             const hashedPassword = bcrypt.hashSync(req.body.password, encrypted);
             req.body.password=hashedPassword 
