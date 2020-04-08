@@ -20,12 +20,67 @@
           </q-toolbar-title>
         </div>
         <div class="col-shrink" v-if="isLoggedIn">
-          <q-icon
-            name="account_circle"
-            style="font-size: 2rem;"
-            class="mouseHover"
-            @click="logout"
-          />
+          <q-btn
+            dense
+            color="none"
+            flat
+            round
+            icon="shopping_cart"
+            class="q-mr-xs"
+            v-if="!isAdmin"
+          >
+            <q-tooltip v-if="!$q.platform.is.mobile">
+              <span class="text-subtitle2">Cart</span>
+            </q-tooltip>
+            <q-badge color="red-8" floating>4</q-badge>
+            <q-menu>
+              <q-list style="min-width: 100px">
+                <q-item clickable v-close-popup>
+                  <q-item-section>View Cart</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
+          <q-btn
+            icon="account_circle"
+            dense
+            color="none"
+            flat
+            round
+            roundclass="mouseHover"
+          >
+            <q-tooltip v-if="!$q.platform.is.mobile">
+              <span class="text-subtitle2">Options</span>
+            </q-tooltip>
+            <q-menu>
+              <q-list style="min-width: 100px">
+                <q-item clickable v-close-popup>
+                  <q-item-section @click="logout">Logout</q-item-section>
+                </q-item>
+                <q-item clickable v-close-popup>
+                  <q-item-section>New incognito tab</q-item-section>
+                </q-item>
+                <q-separator />
+                <q-item clickable v-close-popup>
+                  <q-item-section>Recent tabs</q-item-section>
+                </q-item>
+                <q-item clickable v-close-popup>
+                  <q-item-section>History</q-item-section>
+                </q-item>
+                <q-item clickable v-close-popup>
+                  <q-item-section>Downloads</q-item-section>
+                </q-item>
+                <q-separator />
+                <q-item clickable v-close-popup>
+                  <q-item-section>Settings</q-item-section>
+                </q-item>
+                <q-separator />
+                <q-item clickable v-close-popup>
+                  <q-item-section>Help &amp; Feedback</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
         </div>
         <div class="col-shrink" v-else>
           <div

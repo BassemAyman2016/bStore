@@ -34,7 +34,12 @@ import {
   QImg,
   QForm,
   QInput,
-  Notify
+  Notify,
+  QBadge,
+  QSeparator,
+  QMenu,
+  ClosePopup,
+  QTooltip
 } from "quasar";
 
 Vue.use(Quasar, {
@@ -59,9 +64,15 @@ Vue.use(Quasar, {
     QCardActions,
     QImg,
     QForm,
-    QInput
+    QInput,
+    QBadge,
+    QSeparator,
+    QMenu,
+    QTooltip
   },
-  directives: {},
+  directives: {
+    ClosePopup
+  },
   plugins: {
     Loading,
     LoadingBar,
