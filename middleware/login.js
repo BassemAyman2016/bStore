@@ -19,6 +19,9 @@ function verifyToken(req, res, next) {
             // Next middleware
             jwt.verify(req.token, tokenKey, async(err, authData) => {
                 if (err) {
+                    if(err.name && err.name=="TokenExpiredError"){
+                        return res.status(400).send({ status: 'failure', message: 'Session token expired , please logout and login again' })
+                    }
                     return res.status(400).send({ status: 'failure', message: 'Authentication Failed' })
                 } else {
                     req.id = authData.id
