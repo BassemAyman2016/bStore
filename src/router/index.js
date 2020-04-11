@@ -53,6 +53,12 @@ const routes = [
     name: "ConfirmAccount",
     props: true,
     component: () => import("../views/User/ConfirmAccount.vue")
+  },
+  {
+    path: "/testing",
+    name: "Testing",
+    props: true,
+    component: () => import("../views/Testing.vue")
   }
 ];
 

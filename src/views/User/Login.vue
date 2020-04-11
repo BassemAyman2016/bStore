@@ -2,7 +2,11 @@
   <div class="window-height window-width row justify-center items-center login">
     <div class="col q-pa-lg">
       <div class="row justify-center">
-        <q-card class="shadow-24 animated rollIn login-card col-xs-10 col-md-3">
+        <q-card
+          class="shadow-24 animated rollIn login-card col-xs-10 col-md-3"
+          :class="{ 'animated rollOut': showLeaveAnimation }"
+          style="animation-duration: 1s;"
+        >
           <q-card-section class="bg-indigo-7">
             <div class="text-h5 text-white q-my-md" style="text-align:center;">
               Login
@@ -67,7 +71,8 @@ export default {
   data() {
     return {
       email: null,
-      password: null
+      password: null,
+      showLeaveAnimation: false
     };
   },
   methods: {
@@ -97,6 +102,7 @@ export default {
             this.$store.commit("setUserId", response.id);
             this.$store.commit("setUserType", response.type);
             this.$store.commit("setToken", response.token);
+            this.showLeaveAnimation = true;
             setTimeout(() => {
               this.$router.push({ name: "Products" });
             }, 1500);

@@ -17,7 +17,8 @@ export default new Vuex.Store({
     products: [],
     models: [],
     brands: [],
-    categories: []
+    categories: [],
+    cart: []
   },
   getters: {
     getUserId(state) {
@@ -40,6 +41,9 @@ export default new Vuex.Store({
     },
     getCategories(state) {
       return state.categories;
+    },
+    getCart(state) {
+      return state.cart;
     }
   },
   mutations: {
@@ -56,6 +60,7 @@ export default new Vuex.Store({
       state.user_id = null;
       state.token = null;
       state.type = null;
+      state.cart = [];
     },
     setProducts(state, value) {
       state.products = value;
@@ -68,6 +73,15 @@ export default new Vuex.Store({
     },
     setModels(state, value) {
       state.models = value;
+    },
+    addToCart(state, obj) {
+      state.cart.push(obj);
+    },
+    removeFromCart(state, index) {
+      state.cart.splice(index, 1);
+    },
+    clearCart(state) {
+      state.cart = [];
     }
   },
   actions: {
