@@ -16,7 +16,7 @@ class products extends Model {
   }
 
   static async getAllProducts () {
-    const fetchData = await products.query().select('*').where("deleted","=",false).eager('[images,Category,Model,Brand]') 
+    const fetchData = await products.query().select('*').where("deleted","=",false).eager('[images,Category,Model,Brand]').orderBy('id')
     return fetchData
   }
 

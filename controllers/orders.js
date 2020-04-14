@@ -35,10 +35,11 @@ const createOrder =  async function (req, res) {
             var priceSum = 0
             var checkItems = await Promise.all( req.body.products.map(async (productObj,index)=>{
                 var productObject = await ProductModel.getProductById(productObj.id)
+                console.log("productObject",productObject)
                 if(!productObject) return res.status(400).send({ status: 'failure', message: 'Product(s) does not exist' });
                 priceSum += productObject.price * productObj.count
                 products.push(productObj)
-                if( (productObject.stock-productObj.count) <=0 ){
+                if( (productObject.stock-productObj.count) <0 ){
                     itemUnavailable = true
                 }
                 return productObject
@@ -57,7 +58,7 @@ const createOrder =  async function (req, res) {
                     }
                     const insertOrderProducts = await OrderProducts.insertProducts(products,createOrder)
                     if(insertOrderProducts)
-                        return res.status(200).send({ status: 'success', message: 'Order created successfully'});
+                        return res.status(200).send({ status: 'success', message: 'Order created successfully' , order_id:createOrder.id});
                     else{
                         return res.status(401).send({ status: 'failure', message: 'Error occured in order creation'  })
                     }
