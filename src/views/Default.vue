@@ -12,7 +12,11 @@
             icon="fas fa-bars"
             v-if="isAdmin"
           />
-          <q-toolbar-title class="title-head" shrink>
+          <q-toolbar-title
+            class="title-head"
+            shrink
+            @click="$router.push({ name: 'Products' })"
+          >
             <q-avatar>
               <img style="height:30px;" src="../assets/iconOnly.png" />
             </q-avatar>
@@ -52,10 +56,32 @@
             <q-menu>
               <q-list>
                 <q-item v-for="(cartItem, index) in currentCart" :key="index">
+                  <q-item-section avatar>
+                    <q-avatar rounded>
+                      <img
+                        :src="
+                          cartItem.product.images
+                            ? cartItem.product.images[0].img
+                            : ''
+                        "
+                      />
+                    </q-avatar>
+                  </q-item-section>
                   <q-item-section
                     >{{ cartItem.count }} x
                     {{ cartItem.product.name }}</q-item-section
                   >
+                </q-item>
+                <q-separator />
+                <q-item>
+                  <q-item-section>
+                    <q-btn
+                      dense
+                      class="bg-green-7 text-white"
+                      label="View Cart"
+                      @click="$router.push({ name: 'Cart' })"
+                    ></q-btn>
+                  </q-item-section>
                 </q-item>
               </q-list>
             </q-menu>
@@ -66,7 +92,7 @@
             color="none"
             flat
             round
-            roundclass="mouseHover"
+            class="mouseHover"
           >
             <q-tooltip v-if="!$q.platform.is.mobile">
               <span class="text-subtitle2">Options</span>
@@ -230,6 +256,7 @@ export default {
     },
     logout() {
       this.$store.commit("logout");
+      this.$router.push({ name: "Products" });
     },
     clearCart() {
       this.$store.commit("clearCart");

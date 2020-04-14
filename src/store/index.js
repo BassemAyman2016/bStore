@@ -125,6 +125,32 @@ export default new Vuex.Store({
           }
         })
         .catch(err => console.log(err));
+    },
+    async createOrder(context) {
+      const cart = { products: context.getters.getCart };
+      return api()
+        .post("orders/createOrder", cart)
+        .then(res => {
+          if (res.data.status == "success") {
+            return res.data;
+          }
+        })
+        .catch(err => {
+          return err.response.data;
+        });
+    },
+    async payOrder(context, orderId) {
+      const cart = { products: context.getters.getCart };
+      return api()
+        .put(`orders/payOrder/${orderId}`, cart)
+        .then(res => {
+          if (res.data.status == "success") {
+            return res.data;
+          }
+        })
+        .catch(err => {
+          return err.response.data;
+        });
     }
   },
   plugins: [vuexLocal.plugin]

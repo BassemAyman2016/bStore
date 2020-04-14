@@ -140,10 +140,10 @@
               </div>
             </div>
             <div
-              class="q-mt-md justify-end"
+              class=" row q-mt-md items-center"
               :class="{ row: !$q.platform.is.mobile }"
             >
-              <div class="col-shrink">
+              <div class="col-auto">
                 Total Price:
                 {{ selectedProduct.price * selectedProduct.countOfProducts }}
                 EGP
@@ -153,7 +153,7 @@
                 <q-btn
                   dense
                   class="bg-green-14 text-white"
-                  size="md"
+                  :size="$q.screen.gt.xs ? 'md' : 'sm'"
                   icon="add"
                   label="Add To Cart"
                   @click="addObjectToCart"
@@ -201,6 +201,7 @@ export default {
           });
         });
       }
+      data = data.filter(product => product.stock > 0);
       this.products = data;
     },
     clicked() {
@@ -270,14 +271,15 @@ export default {
       } else {
         var temp = {
           count: this.selectedProduct.countOfProducts,
-          product: this.selectedProduct
+          product: this.selectedProduct,
+          id: this.selectedProduct.id
         };
         this.$store.commit("addToCart", temp);
       }
       this.$q.notify({
         type: "positive",
-        message: "Products added to cart",
-        timeout: 3000
+        message: "Product(s) added to cart",
+        timeout: 10000
       });
       this.showProductCard = false;
     }
