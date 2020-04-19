@@ -41,7 +41,11 @@ import {
   ClosePopup,
   QTooltip,
   QDialog,
-  QSpace
+  QSpace,
+  QExpansionItem,
+  QCarousel,
+  QCarouselControl,
+  QCarouselSlide
 } from "quasar";
 
 Vue.use(Quasar, {
@@ -72,7 +76,11 @@ Vue.use(Quasar, {
     QMenu,
     QTooltip,
     QDialog,
-    QSpace
+    QSpace,
+    QExpansionItem,
+    QCarousel,
+    QCarouselControl,
+    QCarouselSlide
   },
   directives: {
     ClosePopup

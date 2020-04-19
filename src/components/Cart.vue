@@ -150,7 +150,7 @@ export default {
           message: res.message ? res.message : "Error Occured",
           timeout: 2000
         });
-        this.showPayCondition = true;
+        if (res.status && res.status == "success") this.showPayCondition = true;
       });
     },
     removeItemFromCart(index) {

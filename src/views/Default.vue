@@ -54,7 +54,7 @@
               currentCart.length
             }}</q-badge>
             <q-menu>
-              <q-list>
+              <q-list style="min-width:200px">
                 <q-item v-for="(cartItem, index) in currentCart" :key="index">
                   <q-item-section avatar>
                     <q-avatar rounded>
@@ -67,13 +67,13 @@
                       />
                     </q-avatar>
                   </q-item-section>
-                  <q-item-section
+                  <q-item-section class="col-shrink"
                     >{{ cartItem.count }} x
                     {{ cartItem.product.name }}</q-item-section
                   >
                 </q-item>
                 <q-separator />
-                <q-item>
+                <q-item v-if="currentCart.length > 0">
                   <q-item-section>
                     <q-btn
                       dense
@@ -98,30 +98,32 @@
               <span class="text-subtitle2">Options</span>
             </q-tooltip>
             <q-menu>
-              <q-list style="min-width: 100px">
+              <q-list>
                 <q-item clickable v-close-popup>
                   <q-item-section @click="logout">Logout</q-item-section>
                 </q-item>
-                <q-item clickable v-close-popup>
+                <!-- <q-item clickable v-close-popup>
                   <q-item-section>New incognito tab</q-item-section>
                 </q-item>
+                <q-separator /> -->
                 <q-separator />
-                <q-item clickable v-close-popup>
-                  <q-item-section>Recent tabs</q-item-section>
-                </q-item>
-                <q-item clickable v-close-popup>
-                  <q-item-section>History</q-item-section>
-                </q-item>
-                <q-item clickable v-close-popup>
-                  <q-item-section>Downloads</q-item-section>
-                </q-item>
-                <q-separator />
-                <q-item clickable v-close-popup>
-                  <q-item-section>Settings</q-item-section>
+                <q-item
+                  clickable
+                  v-close-popup
+                  v-if="!isAdmin"
+                  no-wrap
+                  @click="changeRoute('MyOrders')"
+                >
+                  <q-item-section>View My Orders</q-item-section>
                 </q-item>
                 <q-separator />
-                <q-item clickable v-close-popup>
-                  <q-item-section>Help &amp; Feedback</q-item-section>
+                <q-item
+                  clickable
+                  v-close-popup
+                  v-if="!isAdmin"
+                  @click="changeRoute('Profile')"
+                >
+                  <q-item-section>My Profile</q-item-section>
                 </q-item>
               </q-list>
             </q-menu>

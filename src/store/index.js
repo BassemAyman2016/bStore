@@ -140,9 +140,57 @@ export default new Vuex.Store({
         });
     },
     async payOrder(context, orderId) {
-      const cart = { products: context.getters.getCart };
       return api()
-        .put(`orders/payOrder/${orderId}`, cart)
+        .put(`orders/payOrder/${orderId}`)
+        .then(res => {
+          if (res.data.status == "success") {
+            return res.data;
+          }
+        })
+        .catch(err => {
+          return err.response.data;
+        });
+    },
+    async cancelOrder(context, orderId) {
+      return api()
+        .put(`orders/cancelOrder/${orderId}`)
+        .then(res => {
+          if (res.data.status == "success") {
+            return res.data;
+          }
+        })
+        .catch(err => {
+          return err.response.data;
+        });
+    },
+    async getCustomerProfile() {
+      return api()
+        .get(`customers/viewProfile`)
+        .then(res => {
+          if (res.data.status == "success") {
+            return res.data;
+          }
+        })
+        .catch(err => {
+          return err.response.data;
+        });
+    },
+    async deactivateProfile(context) {
+      var user_id = context.getters.getUserId;
+      return api()
+        .delete(`customers/deactivateProfile/${user_id}`)
+        .then(res => {
+          if (res.data.status == "success") {
+            return res.data;
+          }
+        })
+        .catch(err => {
+          return err.response.data;
+        });
+    },
+    async editProfile(context, apiObject) {
+      return api()
+        .put(`customers/editProfile`, apiObject)
         .then(res => {
           if (res.data.status == "success") {
             return res.data;
