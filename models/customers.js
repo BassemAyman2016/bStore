@@ -35,7 +35,7 @@ class customers extends Model {
       })
   }
   static async viewProfile(id){
-    return customers.query().findOne({id}).eager('[orders]')
+    return customers.query().findOne({id})
   }
   static async deleteCustomer(id){
     return customers.query().del().where('id',"=",id)

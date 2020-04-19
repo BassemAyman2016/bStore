@@ -61,7 +61,6 @@ class products extends Model {
       var find = await products.query().findOne({
         id:originalProduct.id,
       })
-      console.log("find",originalProduct.id,find.stock)
       var decrement = await find.$query().updateAndFetch({
         stock:find.stock-originalProduct.count
       })

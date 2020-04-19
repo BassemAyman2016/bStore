@@ -46,7 +46,7 @@ const createOrder =  async function (req, res) {
             }))
             if(checkItems){
                 if(itemUnavailable){
-                    return res.status(400).send({ status: 'failure', message: 'An item(s) is unavailable, please refresh page' })    
+                    return res.status(400).send({ status: 'failure', message: 'An item(s) is unavailable, please clear your cart and re-add products' })    
                 }else{
                     const createOrder = await OrderModel.createOrder(checkIfUserExists.id,priceSum)
                     if(!createOrder){
@@ -97,6 +97,19 @@ const getCustomersOrders = async (req,res) => {
     }
     try {
         const customerOrders = await OrderModel.getCertainCustomerOrders(checkIfCustomer.id)
+        customerOrders.forEach(order=>{
+            order.groupedProducts=[]
+            order.products.forEach(product=>{
+                if(order.groupedProducts[product.id]){
+                    order.groupedProducts[product.id].count++
+                }else{
+                    order.groupedProducts[product.id]={count:1,product}
+                }
+            })
+            order.groupedProducts = order.groupedProducts.filter(holder=>holder)
+            order.products = order.groupedProducts
+            delete order.groupedProducts
+        })
             // await Order.find().populate('products');
         if(customerOrders){
             return res.status(200).send({ status: 'success', data: customerOrders });

@@ -15,7 +15,7 @@ class orders extends Model {
     return orders.query().select('*').where('id',id).eager('[products]')
   }
   static async getCertainCustomerOrders(id){
-    return orders.query().select('*').where("customer_id",id).eager('[products]')
+    return orders.query().select('*').where("customer_id",id).eager('[products]').orderBy('id','desc')
   }
   static async getSingleOrder(order_id,user_id){
     return orders.query().findOne({id:order_id,customer_id:user_id}).eager('[products]')
