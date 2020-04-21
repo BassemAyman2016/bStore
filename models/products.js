@@ -96,9 +96,10 @@ class products extends Model {
           return increment
         }
       })])
+      console.log("hereeeeeeeeeee")
     return edits
     } catch (error) {
-      console.log(error)
+      console.log("eeeeeeeeeeee",error)
       return { state:"failure",error:error}
     }
     

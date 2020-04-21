@@ -66,6 +66,8 @@ const Login =  async function (req, res) {
                         return res.status(200).send({ status: 'success', token: `bearer ${token}`, type:'admin', id: checkIfAdmin.id })
                     
                     }
+                }else{
+                    return res.status(404).send({ status: 'failure', message: 'Invalid email or password' });
                 }
         }
     }

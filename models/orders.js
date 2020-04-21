@@ -9,7 +9,7 @@ class orders extends Model {
   }
 
   static async getAllOrders(){
-    return orders.query().select('*').eager('[Customer,products]')
+    return orders.query().select('*').eager('[Customer,products]').orderBy('id','desc')
   }
   static async getOrderById(id){
     return orders.query().select('*').where('id',id).eager('[products]')

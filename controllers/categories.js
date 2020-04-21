@@ -20,7 +20,7 @@ const createCategory =  async function (req, res) {
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
     const checkIfCategoryExists = await CategoryModel.getByName(req.body)
-    if(checkIfCategoryExists){
+    if(checkIfCategoryExists && !checkIfCategoryExists.deleted ){
         return res.status(403).send({ status: 'failure', message: 'Category already exists' });
     }
     const categoryCreation = await CategoryModel.createCategory(req.body)
@@ -47,7 +47,7 @@ const deleteCategory =  async function (req, res) {
     }
     const categoryDeletion = await CategoryModel.setDeleted(category_id)
     if(categoryDeletion){
-        res.status(200).send({ status: 'success', message: 'category created successfully', data: categoryDeletion })
+        res.status(200).send({ status: 'success', message: 'Category deleted successfully', data: categoryDeletion })
     }else{
         res.status(422).send({ status: 'failure', message: 'deletion of category Failed' });
     }

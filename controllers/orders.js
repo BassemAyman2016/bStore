@@ -78,6 +78,19 @@ const getAllOrders = async (req,res) => {
     try {
         const allOrders = await OrderModel.getAllOrders();
         if(allOrders){
+            allOrders.forEach(order=>{
+                order.groupedProducts=[]
+                order.products.forEach(product=>{
+                    if(order.groupedProducts[product.id]){
+                        order.groupedProducts[product.id].count++
+                    }else{
+                        order.groupedProducts[product.id]={count:1,product}
+                    }
+                })
+                order.groupedProducts = order.groupedProducts.filter(holder=>holder)
+                order.products = order.groupedProducts
+                delete order.groupedProducts
+            })
             return res.status(200).send({ status: 'success', data: allOrders });
         }else{
             return res.status(400).send({ status: 'failure', message: 'Error while fetching orders' })
@@ -254,7 +267,7 @@ const adminCancelOrder = async (req,res) => {
         if( findOrder.cancelled ){
             return res.status(401).send({ status: 'failure', message: 'Order is already cancelled' });
         }
-        const cancelOrder = await OrderModel.cancelOrder(req.params.order_id)
+        const cancelOrder = await OrderModel.adminCancelOrder(req.params.order_id)
         if(!cancelOrder){
             return res.status(400).send({ status: 'failure', message: 'Error while cancelling order' })
         }

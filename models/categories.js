@@ -27,7 +27,7 @@ class categories extends Model {
     }).where("id","=",id)
   }
   static async getAllCategories(){
-    return categories.query().select('*').where('deleted','=',false)
+    return categories.query().select('*').where('deleted','=',false).orderBy('id','desc')
   }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {

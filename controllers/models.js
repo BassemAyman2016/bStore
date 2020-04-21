@@ -47,7 +47,7 @@ const deleteModel =  async function (req, res) {
     }
     const modelDeletion = await ModelModel.setDeleted(model_id)
     if(modelDeletion){
-        res.status(200).send({ status: 'success', message: 'model deleted successfully', data: modelDeletion })
+        res.status(200).send({ status: 'success', message: 'Model deleted successfully', data: modelDeletion })
     }else{
         res.status(422).send({ status: 'failure', message: 'deletion of model Failed' });
     }
