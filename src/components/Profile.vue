@@ -69,7 +69,10 @@
             </q-card>
           </div>
         </div>
-        <div class="col-12 q-pa-md" v-if="showEditProfileCard">
+        <div
+          class="col-12 q-pa-md animated slideInDown"
+          v-if="showEditProfileCard"
+        >
           <div class="row text-h5">
             Edit Profile
           </div>
@@ -80,6 +83,7 @@
                   <div class="row">
                     <div class="col q-mr-sm ">
                       <q-input
+                        :style="{ backgroundColor: '#ffffff' }"
                         outlined
                         v-model="edited_first_name"
                         label="First Name"
@@ -91,6 +95,7 @@
                   <div class="row">
                     <div class="col q-mr-sm ">
                       <q-input
+                        :style="{ backgroundColor: '#ffffff' }"
                         outlined
                         v-model="edited_last_name"
                         label="Last Name"
@@ -102,6 +107,7 @@
                   <div class="row">
                     <div class="col q-mr-sm ">
                       <q-input
+                        :style="{ backgroundColor: '#ffffff' }"
                         outlined
                         v-model="edited_address"
                         label="Address"
@@ -113,6 +119,7 @@
                   <div class="row">
                     <div class="col q-mr-sm ">
                       <q-input
+                        :style="{ backgroundColor: '#ffffff' }"
                         outlined
                         v-model="edited_phone_number"
                         label="Phone Number"
@@ -124,7 +131,12 @@
                 <q-card-section class=" col-12 ">
                   <div class="row">
                     <div class="col q-mr-sm ">
-                      <q-input outlined v-model="edited_email" label="Email" />
+                      <q-input
+                        :style="{ backgroundColor: '#ffffff' }"
+                        outlined
+                        v-model="edited_email"
+                        label="Email"
+                      />
                     </div>
                   </div>
                 </q-card-section>
@@ -132,6 +144,7 @@
                   <div class="row">
                     <div class="col q-mr-sm ">
                       <q-input
+                        :style="{ backgroundColor: '#ffffff' }"
                         v-model="edited_password"
                         outlined
                         label="New Password"
@@ -306,6 +319,13 @@ export default {
           this.edited_address = res.data.address;
           this.edited_phone_number = res.data.phone_number;
           this.edited_email = res.data.email;
+        } else {
+          this.$q.notify({
+            type:
+              res.status && res.status == "success" ? "positive" : "negative",
+            message: res.message ? res.message : "Error Occured",
+            timeout: 2000
+          });
         }
       });
     },

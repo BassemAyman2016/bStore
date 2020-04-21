@@ -52,15 +52,11 @@ export default {
         .get(`products/getallProducts`)
         .then(res => {
           if (res.data.status == "success") {
-            console.log(res.data.data);
             this.products = res.data.data;
           }
-          console.log(res.data);
-          console.log(this.products);
         });
     },
     clicked() {
-      console.log("clickeddd");
       this.animation = !this.animation;
       this.$forceUpdate();
     }

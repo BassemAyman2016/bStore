@@ -166,60 +166,58 @@
       content-class="bg-grey-2"
       behavior="mobile"
     >
-      <q-list>
-        <q-item-label header>Essential Links</q-item-label>
-        <q-item clickable tag="a" target="_blank" href="https://quasar.dev">
+      <q-list v-if="isAdmin">
+        <q-item-label header>Products Management</q-item-label>
+        <q-item clickable>
           <q-item-section avatar>
-            <q-icon name="fas fa-graduation-cap" />
+            <q-icon name="add_circle" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Docs</q-item-label>
-            <q-item-label caption>quasar.dev</q-item-label>
+            <q-item-label>Add Product</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item
-          clickable
-          tag="a"
-          target="_blank"
-          href="https://github.com/quasarframework/"
-        >
+        <q-item clickable @click="changeRoute('Categories')">
           <q-item-section avatar>
-            <q-icon name="fas fa-code" />
+            <q-icon name="category" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Github</q-item-label>
-            <q-item-label caption>github.com/quasarframework</q-item-label>
+            <q-item-label>Edit Categories</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item
-          clickable
-          tag="a"
-          target="_blank"
-          href="https://chat.quasar.dev"
-        >
+        <q-item clickable @click="changeRoute('Brands')">
           <q-item-section avatar>
-            <q-icon name="fas fa-comments" />
+            <q-icon name="copyright" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Discord Chat Channel</q-item-label>
-            <q-item-label caption>chat.quasar.dev</q-item-label>
+            <q-item-label>Edit Brands</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item
-          clickable
-          tag="a"
-          target="_blank"
-          href="https://forum.quasar.dev"
-        >
+        <q-item clickable @click="changeRoute('Models')">
           <q-item-section avatar>
             <q-icon name="far fa-clipboard" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Forum</q-item-label>
-            <q-item-label caption>forum.quasar.dev</q-item-label>
+            <q-item-label>Edit Models</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item
+        <q-item-label header>Users Management</q-item-label>
+        <q-item clickable @click="changeRoute('AllCustomers')">
+          <q-item-section avatar>
+            <q-icon name="people" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>View Customers</q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item clickable @click="changeRoute('AllOrders')">
+          <q-item-section avatar>
+            <q-icon name="far fa-clipboard" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>View Orders</q-item-label>
+          </q-item-section>
+        </q-item>
+        <!-- <q-item
           clickable
           tag="a"
           target="_blank"
@@ -232,7 +230,7 @@
             <q-item-label>Twitter</q-item-label>
             <q-item-label caption>@quasarframework</q-item-label>
           </q-item-section>
-        </q-item>
+        </q-item> -->
       </q-list>
     </q-drawer>
 

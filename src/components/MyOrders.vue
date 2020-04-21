@@ -114,6 +114,7 @@
                                       :size="
                                         $q.platform.is.mobile ? 'sm' : 'md'
                                       "
+                                      :dense="$q.platform.is.mobile"
                                       @click="payOrderClicked(order)"
                                     />
                                   </div>
@@ -123,6 +124,7 @@
                                     <q-btn
                                       color="red-8"
                                       label="Cancel Order"
+                                      :dense="$q.platform.is.mobile"
                                       :size="
                                         $q.platform.is.mobile ? 'sm' : 'md'
                                       "

@@ -29,6 +29,33 @@ const routes = [
         path: "/profile",
         name: "Profile",
         component: () => import("../components/Profile.vue")
+      },
+      {
+        path: "/categories",
+        name: "Categories",
+        component: () =>
+          import("../components/ProductsManagement/Categories.vue")
+      },
+      {
+        path: "/brands",
+        name: "Brands",
+        component: () => import("../components/ProductsManagement/Brands.vue")
+      },
+      {
+        path: "/models",
+        name: "Models",
+        component: () => import("../components/ProductsManagement/Models.vue")
+      },
+      {
+        path: "/allOrders",
+        name: "AllOrders",
+        component: () => import("../components/UsersManagement/AllOrders.vue")
+      },
+      {
+        path: "/allCustomers",
+        name: "AllCustomers",
+        component: () =>
+          import("../components/UsersManagement/AllCustomers.vue")
       }
     ]
   },

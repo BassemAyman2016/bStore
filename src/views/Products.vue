@@ -42,7 +42,14 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-2" v-if="$q.screen.gt.sm"></div>
+      <div class="col-2 q-ml-sm" v-if="$q.screen.gt.sm">
+        <q-card>
+          <q-card-section>Category</q-card-section>
+          <q-card-section>Brand</q-card-section>
+          <q-card-section>Model</q-card-section>
+          <q-card-section>Price Range</q-card-section>
+        </q-card>
+      </div>
 
       <div class="col-sm-12 col-md-8">
         <div class="row">
@@ -84,16 +91,46 @@
                   {{ product.Brand.name }}
                 </q-card-section>
                 <q-card-actions class="row justify-center">
-                  <q-btn class="bg-indigo-6 text-white" v-if="$q.screen.gt.sm"
-                    >View More</q-btn
-                  >
-                  <q-btn
-                    round
-                    class="bg-indigo-6 text-white"
-                    icon="info"
-                    v-else
-                  ></q-btn>
-                  <div class="q-mx-sm" v-if="!isAdmin">
+                  <div v-if="isAdmin">
+                    <q-btn
+                      class="bg-indigo-6 text-white q-mx-sm"
+                      v-if="$q.screen.gt.sm"
+                      >Edit</q-btn
+                    >
+                    <q-btn
+                      round
+                      class="bg-indigo-6 text-white q-mx-xs"
+                      icon="edit"
+                      v-else
+                    ></q-btn>
+                    <q-btn
+                      class="bg-red-9 text-white"
+                      @click="deleteProduct(product)"
+                      v-if="$q.screen.gt.sm"
+                      :disable="product.stock <= 0"
+                      >Delete</q-btn
+                    >
+                    <q-btn
+                      round
+                      class="bg-red-9 text-white"
+                      icon="delete_forever"
+                      v-else
+                      @click="deleteProduct(product)"
+                      :disable="product.stock <= 0"
+                    ></q-btn>
+                  </div>
+                  <div v-else>
+                    <q-btn
+                      class="bg-indigo-6 text-white q-mx-sm"
+                      v-if="$q.screen.gt.sm"
+                      >View More</q-btn
+                    >
+                    <q-btn
+                      round
+                      class="bg-indigo-6 text-white q-mx-xs"
+                      icon="info"
+                      v-else
+                    ></q-btn>
                     <q-btn
                       class="bg-red-9 text-white"
                       @click="addToCartClicked(product)"
@@ -195,6 +232,32 @@
           </q-card-section>
         </q-card>
       </q-dialog>
+      <q-dialog v-model="showDeleteDialog" persistent>
+        <q-card>
+          <q-card-section class="row items-center">
+            <span class="q-ml-sm"
+              >Are you sure you want to delete this product?</span
+            >
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn
+              flat
+              label="No"
+              color="primary"
+              v-close-popup
+              @click="deleteAction(1)"
+            />
+            <q-btn
+              flat
+              label="Yes"
+              color="primary"
+              @click="deleteAction(2)"
+              v-close-popup
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
       <div class="col-2" v-if="$q.screen.gt.sm"></div>
     </div>
   </q-page>
@@ -211,7 +274,8 @@ export default {
       animation: false,
       showProductCard: false,
       selectedProduct: {},
-      slide: 1
+      slide: 1,
+      showDeleteDialog: false
     };
   },
   methods: {
@@ -236,6 +300,24 @@ export default {
       }
       data = data.filter(product => product.stock > 0);
       this.products = data;
+      var modelsHolder = {};
+      var brandsHolder = {};
+      var categoriesHolder = {};
+      var brandsUbmrella = [];
+      data.forEach(product => {
+        if (!categoriesHolder[product.Category.name])
+          categoriesHolder[product.Category.name] = {};
+        if (!brandsHolder[product.Brand.name])
+          brandsHolder[product.Brand.name] = {};
+        if (!modelsHolder[product.Model.name])
+          modelsHolder[product.Model.name] = {};
+        if (brandsUbmrella[product.brand_id])
+          brandsUbmrella[product.brand_id].push(product.Model);
+        else brandsUbmrella[product.brand_id] = [product.Model];
+      });
+      // console.log(categoriesHolder);
+      // console.log(brandsHolder);
+      // console.log(brandsUbmrella);
     },
     clicked() {
       this.animation = !this.animation;
@@ -293,7 +375,6 @@ export default {
       });
       this.products.forEach(singleProduct => {
         if (singleProduct.id == this.selectedProduct.id) {
-          console.log(singleProduct.stock);
           singleProduct.stock -= this.selectedProduct.countOfProducts;
         }
       });
@@ -315,6 +396,28 @@ export default {
         timeout: 10000
       });
       this.showProductCard = false;
+    },
+    deleteProduct(product) {
+      this.showDeleteDialog = true;
+      this.selectedProduct = product;
+    },
+    async deleteAction(value) {
+      if (value == 2) {
+        await this.$store
+          .dispatch("deleteProduct", this.selectedProduct.id)
+          .then(async res => {
+            this.$q.notify({
+              type:
+                res.status && res.status == "success" ? "positive" : "negative",
+              message: res.message ? res.message : "Error Occured",
+              timeout: 2000
+            });
+            if (res.status == "success") {
+              await this.getData();
+            }
+          });
+      }
+      this.showDeleteDialog = false;
     }
   },
   created() {

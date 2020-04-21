@@ -6,7 +6,7 @@ Vue.use(Vuex);
 
 const vuexLocal = new VuexPersistence({
   key: "basicData",
-  storage: window.localStorage
+  storage: window.sessionStorage
 });
 
 export default new Vuex.Store({
@@ -119,7 +119,6 @@ export default new Vuex.Store({
       await api()
         .get(`models/getModels`)
         .then(res => {
-          console.log(res.data);
           if (res.data.status == "success") {
             context.commit("setModels", res.data.data);
           }
@@ -195,6 +194,16 @@ export default new Vuex.Store({
           if (res.data.status == "success") {
             return res.data;
           }
+        })
+        .catch(err => {
+          return err.response.data;
+        });
+    },
+    async deleteProduct(context, product_id) {
+      return api()
+        .delete(`products/deleteProduct/${product_id}`)
+        .then(res => {
+          return res.data;
         })
         .catch(err => {
           return err.response.data;
