@@ -124,7 +124,7 @@
               size="md"
               color="red-4"
               class="full-width text-white q-mb-md"
-              label="Sign In"
+              label="Sign Up"
               @click="registerClicked"
             />
           </q-card-actions>

@@ -56,7 +56,7 @@
           <div class="col-12 justify-around">
             <div class="row justify-evenly">
               <q-card
-                class="col-xs-5 col-md-3  q-my-md"
+                class="col-xs-5 col-md-3 q-my-md"
                 :class="{
                   'q-ml-sm': $q.screen.gt.sm,
                   'animated swing': animation,
