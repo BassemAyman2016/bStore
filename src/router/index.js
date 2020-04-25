@@ -56,6 +56,12 @@ const routes = [
         name: "AllCustomers",
         component: () =>
           import("../components/UsersManagement/AllCustomers.vue")
+      },
+      {
+        path: "/addProduct",
+        name: "AddProduct",
+        component: () =>
+          import("../components/ProductsManagement/CreateProduct.vue")
       }
     ]
   },

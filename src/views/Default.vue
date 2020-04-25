@@ -168,7 +168,7 @@
     >
       <q-list v-if="isAdmin">
         <q-item-label header>Products Management</q-item-label>
-        <q-item clickable>
+        <q-item clickable @click="changeRoute('AddProduct')">
           <q-item-section avatar>
             <q-icon name="add_circle" />
           </q-item-section>
