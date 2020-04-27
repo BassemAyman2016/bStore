@@ -96,10 +96,8 @@ class products extends Model {
           return increment
         }
       })])
-      console.log("hereeeeeeeeeee")
     return edits
     } catch (error) {
-      console.log("eeeeeeeeeeee",error)
       return { state:"failure",error:error}
     }
     
@@ -146,6 +144,7 @@ class products extends Model {
       images:{
         relation: Model.HasManyRelation,
         modelClass: ProductImages,
+        filter:query=>query.select("*").where("deleted",false),
         join:{
           from: 'products.id',
           to: "product_images.product_id"

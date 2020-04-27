@@ -7,6 +7,9 @@ class customers extends Model {
   static get tableName () {
     return 'customers'
   }
+  static getAllCustomers(){
+    return customers.query().select("*").eager('[orders]').orderBy('id','desc')
+  }
   static getAllCustomersNotDeleted(){
     return customers.query().select("*").where("deleted","=",false).eager('[orders]')
   }
@@ -67,6 +70,9 @@ class customers extends Model {
       password:newPassword
     })
     return insert
+  }
+  static async activateAccount(id){
+    return customers.query().patchAndFetchById(id,{ deleted: false})
   }
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {
 //     const insertion = await Promise.all(vehicles.map(async vehicle => {

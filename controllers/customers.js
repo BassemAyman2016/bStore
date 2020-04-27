@@ -55,8 +55,23 @@ const getAllCustomers = async (req,res) => {
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
     }
     try {
-        const allCustomers = await CustomerModel.getAllCustomersNotDeleted();
+        const allCustomers = await CustomerModel.getAllCustomers();
         const fillOrders = await OrderProductsModel.fillOrdersProducts(allCustomers)
+        fillOrders.forEach(customer=>{
+            customer.orders.forEach(order=>{
+                order.groupedProducts=[]
+                order.products.forEach(product=>{
+                    if(order.groupedProducts[product.product_id]){
+                        order.groupedProducts[product.product_id].count++
+                    }else{
+                        order.groupedProducts[product.product_id]={count:1,product:product.productData}
+                    }
+                })
+                order.groupedProducts = order.groupedProducts.filter(holder=>holder)
+                order.products = order.groupedProducts
+                delete order.groupedProducts
+            })
+        })
         if(allCustomers){
             return res.status(200).send({ status: 'success', data: fillOrders  });
         }else{

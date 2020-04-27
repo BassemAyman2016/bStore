@@ -30,11 +30,21 @@ class product_images extends Model {
     }))
     return data
   }
-
+  
   static async setDeleted(id){
     return product_images.query().update({
       deleted:true
     }).where("product_id","=",id)
+  }
+  static async deleteImageById(id){
+    return product_images.query().update({
+      deleted:true
+    }).where("id","=",id)
+  }
+  static async restoreDeletedImages(product_id){
+    return product_images.query().update({
+      deleted:false
+    }).where("product_id","=",product_id)
   }
 
 //   static async addNewAcrossCity (new_acrossCities_params, companyId, vehicles, agency_id) {

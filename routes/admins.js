@@ -9,5 +9,7 @@ const admin = require('../controllers/admins');
 // a simple test url to check that all of our files are communicating correctly.
 router.post('/signup', admin.adminSighUp);
 router.delete('/deleteCustomer/:user_id', middleware.verifyToken,admin.adminDeleteCustomer)
+router.delete('/deactivateCustomer/:user_id', middleware.verifyToken,admin.deactivateAccount)
+router.put('/activateCustomer/:user_id', middleware.verifyToken,admin.activateAccount)
 
 module.exports = router;

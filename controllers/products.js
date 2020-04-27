@@ -82,6 +82,8 @@ const editProduct = async function (req, res) {
     if(req.body.model) editObject.model = req.body.model
     if(req.body.price) editObject.price = req.body.price
     if(req.body.category_id) editObject.category_id = req.body.category_id
+    if(req.body.brand_id) editObject.brand_id = req.body.brand_id
+    if(req.body.model_id) editObject.model_id = req.body.model_id
     if(req.body.stock) editObject.stock = req.body.stock
     if(req.body.images) editObject.images = req.body.images 
     // console.log("editObject",editObject)
@@ -136,9 +138,37 @@ const deleteProduct =  async function (req, res) {
         
     }
 }
+const getSingleProduct =  async function (req, res) {
+    var valid_params = req.params
+    const checkIfAdmin = await AdminModel.getAdminById(req.id)
+    if(!checkIfAdmin){
+        return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
+    }
+    if(!valid_params){
+        return res.status(400).send({ status: 'failure', message: 'Product fetching paramters are missing' });
+    }else{
+        var product_id = req.params.product_id
+        if(!product_id){
+            return res.status(400).send({ status: 'failure', message: 'no product selected' });
+        }
+        try {
+            const findIfProductExists = await ProductModel.getProductById(product_id)
+            if(findIfProductExists){
+                return res.status(200).send({ status: 'success', message: 'Product fetched successfully', product: findIfProductExists });
+            }else{
+                return res.status(400).send({ status: 'failure', message: 'Error while fetching product images' })
+            }            
+        } catch (error) {
+            console.log(error)
+            return res.status(400).send({ status: 'failure', message: 'Error while fetching product info' })
+        }
+        
+    }
+}
 module.exports = {
     createProduct,
     getAllProducts,
     editProduct,
-    deleteProduct
+    deleteProduct,
+    getSingleProduct
 }
