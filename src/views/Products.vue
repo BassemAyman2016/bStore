@@ -76,7 +76,7 @@
                 <!-- <img class="product-image" :src="product.images[0].img" /> -->
 
                 <q-card-section>
-                  <div class="">{{ product.Model.name }}</div>
+                  <div class="">{{ product.Brand.name }}</div>
                   <div class="row justify-between">
                     <div class="col-shrink text-subtitle1">
                       {{ product.name }}
@@ -88,19 +88,21 @@
                 </q-card-section>
 
                 <q-card-section class="q-pt-none">
-                  {{ product.Brand.name }}
+                  {{ product.Model.name }}
                 </q-card-section>
                 <q-card-actions class="row justify-center">
                   <div v-if="isAdmin">
                     <q-btn
                       class="bg-indigo-6 text-white q-mx-sm"
                       v-if="$q.screen.gt.sm"
+                      @click="editProductClicked(product)"
                       >Edit</q-btn
                     >
                     <q-btn
                       round
                       class="bg-indigo-6 text-white q-mx-xs"
                       icon="edit"
+                      @click="editProductClicked(product)"
                       v-else
                     ></q-btn>
                     <q-btn
@@ -418,6 +420,10 @@ export default {
           });
       }
       this.showDeleteDialog = false;
+    },
+    editProductClicked(value) {
+      this.$store.commit("setSelectedProduct", value);
+      this.$router.push({ name: "ProductEdit" });
     }
   },
   created() {

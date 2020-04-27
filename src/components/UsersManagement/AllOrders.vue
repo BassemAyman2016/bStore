@@ -6,17 +6,25 @@
       <div :class="$q.screen.gt.sm ? 'col-8' : 'col-12'">
         <div class="row">
           <div class="col-12 q-pa-md">
-            <div class="row text-h5">
-              All Orders:
+            <div class="row justify-between items-center q-mb-sm">
+              <div
+                class="col-shrink"
+                :class="{ 'text-h5': !$q.platform.is.mobile }"
+              >
+                All Orders:
+              </div>
+              <div class="col-shrink">
+                <SearchField
+                  :labelName="'Order Number'"
+                  @searchEvent="searchTextInserted"
+                />
+              </div>
             </div>
             <div class="row">
               <q-card class=" bg-grey-1" style="width:100%;">
                 <div class="column">
                   <q-list bordered class="rounded-borders">
-                    <div
-                      v-for="(order, index) in tempCurrentOrders"
-                      :key="index"
-                    >
+                    <div v-for="(order, index) in outputOrders" :key="index">
                       <q-expansion-item expand-separator>
                         <template v-slot:header>
                           <q-item-section avatar>
@@ -199,9 +207,13 @@
 </template>
 
 <script>
+import SearchField from "../Fields/SearchField";
 import api from "../../store/api";
 export default {
   name: "MyOrders",
+  components: {
+    SearchField
+  },
   data() {
     return {
       totalPrice: 0,
@@ -210,7 +222,8 @@ export default {
       createdOrderId: null,
       currentOrders: [],
       tempCurrentOrders: [],
-      selectedOrder: { id: 0 }
+      selectedOrder: { id: 0 },
+      searchValue: ""
     };
   },
   methods: {
@@ -306,11 +319,22 @@ export default {
             this.currentOrders = holder;
           }
         });
+    },
+    searchTextInserted(value) {
+      this.searchValue = value;
     }
   },
   computed: {
     currentCart() {
       return this.$store.getters.getCart;
+    },
+    outputOrders() {
+      return this.tempCurrentOrders.filter(order => {
+        if (this.searchValue.length > 0) {
+          return order.id == this.searchValue;
+        }
+        return true;
+      });
     }
   },
   created() {

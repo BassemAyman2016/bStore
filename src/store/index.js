@@ -18,7 +18,8 @@ export default new Vuex.Store({
     models: [],
     brands: [],
     categories: [],
-    cart: []
+    cart: [],
+    selectedProduct: {}
   },
   getters: {
     getUserId(state) {
@@ -44,6 +45,9 @@ export default new Vuex.Store({
     },
     getCart(state) {
       return state.cart;
+    },
+    getSelectedProduct(state) {
+      return state.selectedProduct;
     }
   },
   mutations: {
@@ -82,6 +86,9 @@ export default new Vuex.Store({
     },
     clearCart(state) {
       state.cart = [];
+    },
+    setSelectedProduct(state, value) {
+      state.selectedProduct = value;
     }
   },
   actions: {
@@ -207,6 +214,15 @@ export default new Vuex.Store({
         })
         .catch(err => {
           return err.response.data;
+        });
+    },
+    async fetchCurrentProduct(context, product_id) {
+      await api()
+        .get(`products/getSingleProduct/${product_id}`)
+        .then(res => {
+          if (res.data.status && res.data.status == "success") {
+            context.commit("setSelectedProduct", res.data.product);
+          }
         });
     }
   },
