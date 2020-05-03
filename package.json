@@ -6,7 +6,8 @@
     "scripts": {
         "test": "test",
         "dev": "nodemon index.js",
-        "knex": "node_modules/.bin/knex"
+        "knex": "node_modules/.bin/knex",
+        "start": "node index.js"
     },
     "repository": {
         "type": "git",
