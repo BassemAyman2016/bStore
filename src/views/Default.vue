@@ -31,8 +31,7 @@
             round
             icon="search"
             class="q-mr-xs"
-            v-if="!isAdmin"
-            @click="clearCart"
+            @click="searchClicked"
           >
             <q-tooltip v-if="!$q.platform.is.mobile">
               <span class="text-subtitle2">Search</span>
@@ -137,7 +136,7 @@
             round
             icon="search"
             class="q-mr-xs"
-            v-if="!isAdmin"
+            @click="searchClicked"
           >
             <q-tooltip v-if="!$q.platform.is.mobile">
               <span class="text-subtitle2">Search</span>
@@ -260,6 +259,9 @@ export default {
     },
     clearCart() {
       this.$store.commit("clearCart");
+    },
+    searchClicked() {
+      this.$router.push({ name: "Search" });
     }
   },
   created() {

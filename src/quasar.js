@@ -47,7 +47,8 @@ import {
   QCarouselControl,
   QCarouselSlide,
   QBtnDropdown,
-  QToggle
+  QToggle,
+  QRange
 } from "quasar";
 
 Vue.use(Quasar, {
@@ -84,7 +85,8 @@ Vue.use(Quasar, {
     QCarouselControl,
     QCarouselSlide,
     QBtnDropdown,
-    QToggle
+    QToggle,
+    QRange
   },
   directives: {
     ClosePopup

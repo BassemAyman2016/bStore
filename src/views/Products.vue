@@ -66,90 +66,96 @@
                 :key="index"
                 :title="product.stock <= 0 ? 'Unavailable' : ''"
               >
-                <q-img
-                  :src="product.images[0].img"
-                  :ratio="1"
-                  placeholder-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEXMzMyWlpaqqqq3t7fFxcW+vr6xsbGjo6OcnJyLKnDGAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg=="
-                  spinner-color="white"
-                  style="height: 150px; max-width:100%"
-                />
-                <!-- <img class="product-image" :src="product.images[0].img" /> -->
-
-                <q-card-section>
-                  <div class="">{{ product.Brand.name }}</div>
-                  <div class="row justify-between">
-                    <div class="col-shrink text-subtitle1">
-                      {{ product.name }}
-                    </div>
-                    <div class="col-shrink text-subtitle1">
-                      {{ product.price }}EGP
-                    </div>
+                <div class="column justify-between" style="height:100%;">
+                  <div class="col-shrink">
+                    <q-img
+                      :src="product.images[0].img"
+                      :ratio="1"
+                      placeholder-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEXMzMyWlpaqqqq3t7fFxcW+vr6xsbGjo6OcnJyLKnDGAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg=="
+                      spinner-color="white"
+                      style="height: 150px; max-width:100%"
+                    />
+                    <!-- <img class="product-image" :src="product.images[0].img" /> -->
+                    <q-card-section>
+                      <div class="">{{ product.Brand.name }}</div>
+                      <div class="row justify-between">
+                        <div class="col-shrink text-subtitle1">
+                          {{ product.name }}
+                        </div>
+                        <div class="col-shrink text-subtitle1">
+                          {{ product.price }}EGP
+                        </div>
+                      </div>
+                    </q-card-section>
+                    <q-card-section class="q-pt-none">
+                      {{ product.Model.name }}
+                    </q-card-section>
                   </div>
-                </q-card-section>
-
-                <q-card-section class="q-pt-none">
-                  {{ product.Model.name }}
-                </q-card-section>
-                <q-card-actions class="row justify-center">
-                  <div v-if="isAdmin">
-                    <q-btn
-                      class="bg-indigo-6 text-white q-mx-sm"
-                      v-if="$q.screen.gt.sm"
-                      @click="editProductClicked(product)"
-                      >Edit</q-btn
-                    >
-                    <q-btn
-                      round
-                      class="bg-indigo-6 text-white q-mx-xs"
-                      icon="edit"
-                      @click="editProductClicked(product)"
-                      v-else
-                    ></q-btn>
-                    <q-btn
-                      class="bg-red-9 text-white"
-                      @click="deleteProduct(product)"
-                      v-if="$q.screen.gt.sm"
-                      :disable="product.stock <= 0"
-                      >Delete</q-btn
-                    >
-                    <q-btn
-                      round
-                      class="bg-red-9 text-white"
-                      icon="delete_forever"
-                      v-else
-                      @click="deleteProduct(product)"
-                      :disable="product.stock <= 0"
-                    ></q-btn>
+                  <div class="col-shrink">
+                    <q-card-actions class="row justify-center">
+                      <div v-if="isAdmin">
+                        <q-btn
+                          class="bg-indigo-6 text-white q-mx-sm"
+                          v-if="$q.screen.gt.sm"
+                          @click="editProductClicked(product)"
+                          >Edit</q-btn
+                        >
+                        <q-btn
+                          round
+                          class="bg-indigo-6 text-white q-mx-xs"
+                          icon="edit"
+                          @click="editProductClicked(product)"
+                          v-else
+                        ></q-btn>
+                        <q-btn
+                          class="bg-red-9 text-white"
+                          @click="deleteProduct(product)"
+                          v-if="$q.screen.gt.sm"
+                          :disable="product.stock <= 0"
+                          >Delete</q-btn
+                        >
+                        <q-btn
+                          round
+                          class="bg-red-9 text-white"
+                          icon="delete_forever"
+                          v-else
+                          @click="deleteProduct(product)"
+                          :disable="product.stock <= 0"
+                        ></q-btn>
+                      </div>
+                      <div v-else>
+                        <q-btn
+                          class="bg-indigo-6 text-white q-mx-sm"
+                          v-if="$q.screen.gt.sm"
+                          @click="viewMoreClicked(product)"
+                          >View More</q-btn
+                        >
+                        <q-btn
+                          round
+                          class="bg-indigo-6 text-white q-mx-xs"
+                          icon="info"
+                          v-else
+                          @click="viewMoreClicked(product)"
+                        ></q-btn>
+                        <q-btn
+                          class="bg-red-9 text-white"
+                          @click="addToCartClicked(product)"
+                          v-if="$q.screen.gt.sm"
+                          :disable="product.stock <= 0"
+                          >Add to Cart</q-btn
+                        >
+                        <q-btn
+                          round
+                          class="bg-red-9 text-white"
+                          icon="add_shopping_cart"
+                          v-else
+                          @click="addToCartClicked(product)"
+                          :disable="product.stock <= 0"
+                        ></q-btn>
+                      </div>
+                    </q-card-actions>
                   </div>
-                  <div v-else>
-                    <q-btn
-                      class="bg-indigo-6 text-white q-mx-sm"
-                      v-if="$q.screen.gt.sm"
-                      >View More</q-btn
-                    >
-                    <q-btn
-                      round
-                      class="bg-indigo-6 text-white q-mx-xs"
-                      icon="info"
-                      v-else
-                    ></q-btn>
-                    <q-btn
-                      class="bg-red-9 text-white"
-                      @click="addToCartClicked(product)"
-                      v-if="$q.screen.gt.sm"
-                      :disable="product.stock <= 0"
-                      >Add to Cart</q-btn
-                    >
-                    <q-btn
-                      round
-                      class="bg-red-9 text-white"
-                      icon="add_shopping_cart"
-                      v-else
-                      @click="addToCartClicked(product)"
-                      :disable="product.stock <= 0"
-                    ></q-btn>
-                  </div>
-                </q-card-actions>
+                </div>
               </q-card>
             </div>
           </div>
@@ -424,6 +430,10 @@ export default {
     editProductClicked(value) {
       this.$store.commit("setSelectedProduct", value);
       this.$router.push({ name: "ProductEdit" });
+    },
+    viewMoreClicked(value) {
+      this.$store.commit("setSelectedProduct", value);
+      this.$router.push({ name: "ViewMore" });
     }
   },
   created() {

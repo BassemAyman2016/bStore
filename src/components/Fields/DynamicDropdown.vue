@@ -1,4 +1,3 @@
-/* eslint-disable vue/no-side-effects-in-computed-properties */
 <template>
   <div
     @click="toggleDisplay"
@@ -14,17 +13,10 @@
         fullWidth: fullWidth,
         'editCustom-container': !withLabel
       }"
-      :style="{ 'min-height': height + 'px' }"
     >
-      <input
-        class="dynamic-dropdown__text-input"
-        type="text"
-        @keyup="keyMonitor"
-        v-model="searchFilter"
-      />
       <div class="dynamic-dropdown__container row">
         <div
-          class="dynamic-dropdown__container__option column shrink"
+          class="dynamic-dropdown__container__option col-shrink"
           style="display:inline;"
           :class="{ 'editCustom-option': !withLabel }"
           v-for="option in selectedOptions"
@@ -53,15 +45,9 @@
         :class="{
           'blue fas fa-angle-up': clicked,
           'fas fa-angle-down': !clicked,
-          'editCustom-arrow': !withLabel,
-          orange: tourOperator
+          'editCustom-arrow': !withLabel
         }"
       ></i>
-      <span
-        v-if="requiredInput && flagRequired"
-        class="dynamic-dropdown__message"
-        >Required Input</span
-      >
     </div>
     <div
       class="options row"
@@ -69,14 +55,10 @@
       v-show="clicked"
       style="font-size:10px;"
     >
-      <div class="column no-padding">
-        <div
-          class="row"
-          v-for="(option, index) in filteredOptions"
-          :key="index"
-        >
+      <div class="col ">
+        <div class="row " v-for="(option, index) in inputData" :key="index">
           <span
-            class="options__title no-padding"
+            class="options__title q-px-sm q-py-xs"
             @click="selectOption(option)"
             >{{ option[selectedDisplay] }}</span
           >
@@ -126,45 +108,22 @@ export default {
     selectedDisplay: {
       required: false,
       default: "name"
-    },
-    height: {
-      required: false,
-      default: 40
-    },
-    requiredInput: {
-      required: false,
-      default: false
-    },
-    tourOperator: {
-      required: false,
-      default: false
-    },
-    closeOnSelection: {
-      required: false,
-      default: false
     }
   },
   data() {
     return {
       clicked: false,
       selectedOptions: [],
-      labelFlag: false,
-      searchFilter: "",
-      flagRequired: false
+      labelFlag: false
     };
   },
   methods: {
     CloseDisplay() {
       if (this.clicked) {
-        this.searchFilter = "";
-        if (this.selectedOptions.length == 0) {
-          this.flagRequired = true;
-        }
         this.toggleDisplay();
       }
     },
     toggleDisplay() {
-      this.searchFilter = "";
       this.clicked = !this.clicked;
       if (!this.clicked) {
         if (this.selectedOptions.length == 0) this.labelFlag = !this.labelFlag;
@@ -184,18 +143,13 @@ export default {
           if (this.selectedOptions.length == 0) {
             option.selected = true;
             this.selectedOptions.push(option);
-            this.flagRequired = false;
           }
         } else {
           option.selected = true;
           this.selectedOptions.push(option);
-          this.flagRequired = false;
         }
       }
-      if (this.requiredInput) this.$emit("validEmit", true);
-
       this.$emit("selectedOptions", this.selectedOptions);
-      if (this.closeOnSelection) this.toggleDisplay();
     },
     deselectOption(option) {
       var optionIndex = -1;
@@ -210,10 +164,6 @@ export default {
       }
       this.selectedOptions.splice(optionIndex, 1);
       this.$emit("selectedOptions", this.selectedOptions);
-      if (this.requiredInput && this.selectedOptions.length == 0) {
-        this.$emit("validEmit", false);
-        this.flagRequired = true;
-      }
     },
     clearField() {
       this.selectedOptions = [];
@@ -225,15 +175,6 @@ export default {
           this.selectedOptions.push(option);
         });
         this.$emit("selectedOptions", this.selectedOptions);
-        if (this.initialData.length > 0) {
-          this.labelFlag = true;
-        }
-      }
-    },
-    keyMonitor: function(event) {
-      if (event.key === "Enter" && this.filteredOptions[0]) {
-        this.selectOption(this.filteredOptions[0]);
-        this.searchFilter = "";
       }
     }
   },
@@ -276,28 +217,8 @@ export default {
       // eslint-disable-next-line no-unused-vars
       unbind: function(el, binding) {
         // Remove Event Listeners
-
         document.removeEventListener("click", el.__vueClickOutside__);
         el.__vueClickOutside__ = null;
-      }
-    }
-  },
-  computed: {
-    filteredOptions() {
-      const filtered = [];
-      if (this.searchFilter == "") {
-        return this.inputData;
-      } else {
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.clicked = true;
-        this.inputData.forEach(option => {
-          if (
-            option.name.toLowerCase().includes(this.searchFilter.toLowerCase())
-          ) {
-            filtered.push(option);
-          }
-        });
-        return filtered;
       }
     }
   }
@@ -307,7 +228,6 @@ export default {
 <style lang="scss" scoped>
 .container {
   position: relative;
-  font-family: $fontfamily-all;
   margin: 5px 0px;
   .dynamic-dropdown {
     position: relative;
@@ -318,22 +238,19 @@ export default {
     min-width: 200px;
     background-color: white;
     z-index: 1;
-    min-width: 150px;
     &__container {
       margin-top: 2px;
       padding-right: 30px;
       &__option {
         display: inline;
-        background-color: $table-header-background-color;
+        background-color: #eaeaea;
         border-radius: 3px;
         margin: 5px 2.5px;
         padding: 4px 9px;
         font-size: 11px;
-        // color: $fontcolor-all;
         font-weight: bold;
         &__x {
           font-size: 9px;
-          // color:$fontcolor-all;
           margin-left: 5px;
           &:hover {
             cursor: pointer;
@@ -357,6 +274,7 @@ export default {
       margin-bottom: 0;
       border: 0;
       height: 38px;
+      outline: none;
     }
 
     .focus {
@@ -364,7 +282,7 @@ export default {
       padding: 1px;
       font-size: 12px;
       font-weight: bold;
-      color: $fontcolor-all;
+      color: #1467ba;
       z-index: 2;
       height: 18px;
     }
@@ -378,10 +296,9 @@ export default {
       }
     }
     .blue {
-      color: $fontcolor-all;
+      color: #1467ba;
     }
     .orange {
-      color: $tour-operator-default-secondary-color;
     }
     .label-border {
       border-bottom: solid 2px white;
@@ -409,7 +326,7 @@ export default {
     }
   }
   .blueBorder {
-    border: 1px solid $fontcolor-all;
+    border: 1px solid #1467ba;
   }
   .createSectionCustomWidth {
     // min-width: 255px;
@@ -426,7 +343,7 @@ export default {
     top: 40px;
     position: absolute;
     background-color: white;
-    border: $input-border;
+    border: 1px solid #1467ba;
     border-radius: 3px;
     z-index: 3;
     max-height: 225px;
@@ -439,7 +356,7 @@ export default {
       padding: 5px 5px;
       width: 100%;
       &:hover {
-        background-color: $table-edit-section-color;
+        background-color: #eaeaea;
         cursor: pointer;
       }
     }
