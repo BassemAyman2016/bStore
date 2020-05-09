@@ -1,14 +1,9 @@
-const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken')
-// const passport = require('passport')
-// const Group = require('../models/Group');
 const ProductModel = require('../models/products')
 const AdminModel = require('../models/admins')
 const ProductImagesModel = require('../models/prodcut_images')
 const BrandModel = require('../models/brands')
 const ModelModel = require('../models/models')
 const CategoryModel = require('../models/categories')
-// const tokenKey = require('../config').secretOrKey
 require('dotenv').config();
 
 const createProduct =  async function (req, res) {
@@ -35,7 +30,6 @@ const createProduct =  async function (req, res) {
         return res.status(400).send({ status: 'failure', message: 'Product creation paramters are missing' });
     }else{
         const name = req.body.name
-        // const findIfProductWithSameNameExists = await ProductModel.findOne({ 'name': name });
         const findIfProductWithSameNameExists = await ProductModel.getProductByName(name);
         if(findIfProductWithSameNameExists){
             return res.status(400).send({ status: 'failure', message: 'Product already exists' })
@@ -86,7 +80,6 @@ const editProduct = async function (req, res) {
     if(req.body.model_id) editObject.model_id = req.body.model_id
     if(req.body.stock) editObject.stock = req.body.stock
     if(req.body.images) editObject.images = req.body.images 
-    // console.log("editObject",editObject)
     const findProduct = await ProductModel.getProductById(product_id)
     if(!findProduct){
         return res.status(400).send({ status: 'failure', message: 'Product not found' })

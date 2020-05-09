@@ -1,19 +1,12 @@
 const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken')
-// const passport = require('passport')
-// const Group = require('../models/Group');
 const CustomerModel = require('../models/customers')
 const AdminModel = require('../models/admins')
 const OrdersModel = require('../models/orders')
 const OrderProductsModel = require('../models/order_products')
 const ProductModel = require('../models/products')
-// const GroupUser = require('../models/GroupUser');
-// const User = require('../models/User')
-// const tokenKey = require('../config').secretOrKey
 const fs = require('fs')
 const EmailAdapter = require('../helpers/mailAdapter')
 const path  = require('path')
-const crypto = require('crypto')
 require('dotenv').config();
 
 const customerSignup =  async function (req, res) {
@@ -84,7 +77,6 @@ const getAllCustomers = async (req,res) => {
 }
 const viewProfile = async (req,res) => {
     try {
-        // const checkIfUserExists = await Customer.findOne({ _id : req.id }).populate('orders')
         const checkIfUserExists = await CustomerModel.viewProfile(req.id)
         if(!checkIfUserExists){
             return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
@@ -151,7 +143,7 @@ const deactivateProfile = async (req,res) => {
             const userOrders = await OrdersModel.getCertainCustomerOrders(userID)
             var ordersIDs = []
             userOrders.forEach(order=>{
-                if(!order.payed && !order.cancelled){
+                if(!order.paid && !order.cancelled){
                     ordersIDs.push(order.id)
                 }
             })

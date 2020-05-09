@@ -1,12 +1,3 @@
-// const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken')
-// const passport = require('passport')
-// const Group = require('../models/Group');
-// const Product = require('../models/Product')
-// const Admin = require('../models/Admin')
-// const Order = require('../models/Order')
-// const Customer = require('../models/Customer')
-// const tokenKey = require('../config').secretOrKey
 const CustomerModel = require('../models/customers')
 const OrderModel = require('../models/orders')
 const AdminModel = require('../models/admins')
@@ -19,6 +10,7 @@ require('dotenv').config();
 
 const createOrder =  async function (req, res) {
     var valid_params = req.body && req.body.products 
+    
     const checkIfUserExists = await CustomerModel.getCustomerById(req.id)
     if(!checkIfUserExists){
         return res.status(403).send({ status: 'failure', message: 'you are not a user of this platform' });
@@ -35,7 +27,6 @@ const createOrder =  async function (req, res) {
             var priceSum = 0
             var checkItems = await Promise.all( req.body.products.map(async (productObj,index)=>{
                 var productObject = await ProductModel.getProductById(productObj.id)
-                console.log("productObject",productObject)
                 if(!productObject) return res.status(400).send({ status: 'failure', message: 'Product(s) does not exist' });
                 priceSum += productObject.price * productObj.count
                 products.push(productObj)
@@ -48,19 +39,37 @@ const createOrder =  async function (req, res) {
                 if(itemUnavailable){
                     return res.status(400).send({ status: 'failure', message: 'An item(s) is unavailable, please clear your cart and re-add products' })    
                 }else{
-                    const createOrder = await OrderModel.createOrder(checkIfUserExists.id,priceSum)
-                    if(!createOrder){
-                        return res.status(404).send({ status: 'failure', message: 'Error occured in order creation'})
-                    }
-                    const decreaseProductStock = await ProductModel.decrementProductStock(products)
-                    if(!decreaseProductStock){
-                        return res.status(404).send({ status: 'failure', message: 'Error occured in order creation' })
-                    }
-                    const insertOrderProducts = await OrderProducts.insertProducts(products,createOrder)
-                    if(insertOrderProducts)
-                        return res.status(200).send({ status: 'success', message: 'Order created successfully' , order_id:createOrder.id});
-                    else{
-                        return res.status(401).send({ status: 'failure', message: 'Error occured in order creation'  })
+                    const knex = OrderProducts.knex()
+                    const returnValue = await knex.transaction(async trx => {
+                        const stripe = require('stripe')(process.env.STRIPE_KEY);
+                        const paymentIntent = await stripe.paymentIntents.create({
+                            amount: priceSum*100,
+                            currency: 'egp',
+                            metadata: {integration_check: 'accept_a_payment'},
+                        });
+                        var intent
+                        if(paymentIntent && paymentIntent.client_secret){
+                            intent = paymentIntent.client_secret
+                        }else{
+                            intent = ""
+                        }
+                        const createOrder = await OrderModel.createOrder(checkIfUserExists.id, priceSum, intent, {trx})
+                        if(!createOrder){
+                            return res.status(404).send({ status: 'failure', message: 'Error occured in order creation'})
+                        }
+                        const decreaseProductStock = await ProductModel.decrementProductStock(products, {trx})
+                        if(!decreaseProductStock){
+                            return res.status(404).send({ status: 'failure', message: 'Error occured in order creation' })
+                        }
+                        const insertOrderProducts = await OrderProducts.insertProducts(products, createOrder, {trx})
+                        if(!insertOrderProducts){
+                            return res.status(401).send({ status: 'failure', message: 'Error occured in order creation'  })
+                        }
+                        return {id:createOrder.id,payment_intent:intent}
+                    
+                    })
+                    if(returnValue){
+                        return res.status(200).send({ status: 'success', message: 'Order created successfully' , id: returnValue.id, payment_intent: returnValue.payment_intent });
                     }
                 }
             }
@@ -123,7 +132,6 @@ const getCustomersOrders = async (req,res) => {
             order.products = order.groupedProducts
             delete order.groupedProducts
         })
-            // await Order.find().populate('products');
         if(customerOrders){
             return res.status(200).send({ status: 'success', data: customerOrders });
         }else{
@@ -175,8 +183,8 @@ const cancelOrder = async (req,res) => {
         if(!findOrder){
             return res.status(401).send({ status: 'failure', message: 'Order not found' });
         }
-        if( findOrder.payed ){
-            return res.status(401).send({ status: 'failure', message: 'Order is already payed' });
+        if( findOrder.paid ){
+            return res.status(401).send({ status: 'failure', message: 'Order is already paid' });
         }
         if( findOrder.cancelled ){
             return res.status(401).send({ status: 'failure', message: 'Order is already cancelled' });
@@ -211,7 +219,7 @@ const cancelOrder = async (req,res) => {
     }
 }
 const payOrder = async (req,res) => {
-    var valid_params = req.params
+    var valid_params = req.params && req.body
     if(!valid_params){
         return res.status(400).send({ status: 'failure', message: 'Order payment paramters are missing' });
     }
@@ -223,25 +231,29 @@ const payOrder = async (req,res) => {
         return res.status(403).send({ status: 'failure', message: 'your account is deactivated' });
     }
     try {
-        const findOrder = await OrderModel.getSingleOrder(req.params.order_id,checkIfCustomer.id)
-        if(!findOrder){
-            return res.status(401).send({ status: 'failure', message: 'Order not found' });
-        }
-        if( findOrder.payed ){
-            return res.status(401).send({ status: 'failure', message: 'Order is already payed' });
-        }
-        if( findOrder.cancelled ){
-            return res.status(401).send({ status: 'failure', message: 'Order is already cancelled' });
-        }
-        const payOrder = await OrderModel.payOrder(req.params.order_id,checkIfCustomer.id)
-        if(!payOrder){
-            return res.status(400).send({ status: 'failure', message: 'Error while paying order' })
-        }else{
-            const email = checkIfCustomer.email
-            const html = fs.readFileSync(path.resolve(__dirname, '../emails/paymentEmail.html'), 'utf8').toString()
-            const sendMail = await EmailAdapter.send('no-reply@bStore.com', email, 'Order Payment Notification', 'Congratulations, you payed for your order', html)
-        }
-        return res.status(200).send({ status: 'success', message:"Order payed successfully" });
+        const knex = OrderModel.knex()
+        const returnedValue =await knex.transaction(async trx=>{
+            const findOrder = await OrderModel.getSingleOrder(req.params.order_id,checkIfCustomer.id)
+            if(!findOrder){
+                return res.status(401).send({ status: 'failure', message: 'Order not found' });
+            }
+            if( findOrder.paid ){
+                return res.status(401).send({ status: 'failure', message: 'Order is already paid' });
+            }
+            if( findOrder.cancelled ){
+                return res.status(401).send({ status: 'failure', message: 'Order is already cancelled' });
+            }
+            const payOrder = await OrderModel.payOrder(req.params.order_id, checkIfCustomer.id, { trx } )
+            if(!payOrder){
+                return res.status(400).send({ status: 'failure', message: 'Error while paying order' })
+            }else{
+                const email = checkIfCustomer.email
+                const html = fs.readFileSync(path.resolve(__dirname, '../emails/paymentEmail.html'), 'utf8').toString()
+                const sendMail = await EmailAdapter.send('no-reply@bStore.com', email, 'Order Payment Notification', 'Congratulations, you paid for your order', html)
+            }
+            return res.status(200).send({ status: 'success', message:"Order paid successfully" });
+        })
+        return returnedValue
     } catch (error) {
         console.log(error)
         return res.status(401).send({ status: 'failure', message: 'Error occurred while paying order' ,error:error })
@@ -261,8 +273,8 @@ const adminCancelOrder = async (req,res) => {
         if(!findOrder){
             return res.status(401).send({ status: 'failure', message: 'Order not found' });
         }
-        if( findOrder.payed ){
-            return res.status(401).send({ status: 'failure', message: 'Order is already payed' });
+        if( findOrder.paid ){
+            return res.status(401).send({ status: 'failure', message: 'Order is already paid' });
         }
         if( findOrder.cancelled ){
             return res.status(401).send({ status: 'failure', message: 'Order is already cancelled' });
