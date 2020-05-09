@@ -16,7 +16,7 @@ module.exports = {
       charset: 'utf-8',
       timezone: 'utc'
     },
-    
+
     pool: {
       min: 2,
       max: 10
@@ -32,7 +32,7 @@ module.exports = {
     // debug: true
   },
   production: {
-    client: 'pg',
+    client: 'postgresql',
     connection: process.env.DATABASE_CONNECTION_URL+'?ssl=true',
     pool: {
       min: 2, // TODO might want to increase but based on the instance
