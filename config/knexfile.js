@@ -32,16 +32,7 @@ module.exports = {
   },
   production: {
     client: 'pg',
-    // connection: process.env.DATABASE_CONNECTION_URL+'?ssl=true',
-    connection:{
-      database: process.env.DB_NAME1,
-      host: process.env.DB_HOST1,
-      port: process.env.DB_PORT1,
-      user: process.env.DB_USER1,
-      password: process.env.DB_PASSWORD1,
-      charset: 'utf-8',
-      timezone: 'utc'
-    },
+    connection: process.env.DATABASE_CONNECTION_URL+'?ssl=true',
     pool: {
       min: 2, // TODO might want to increase but based on the instance
       max: 10
