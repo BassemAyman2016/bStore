@@ -2,12 +2,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 const AdminModel = require('../models/admins')
 const CustomerModel = require('../models/customers')
-const tokenKey = require('../config/setup').secretOrKey
+const currentConfig = require('../config/setup')
 const crypto = require('crypto')
 const fs = require('fs')
 const EmailAdapter = require('../helpers/mailAdapter')
 const path  = require('path')
 require('dotenv').config();
+const tokenKey = currentConfig.secretOrKey
 
 const Login =  async function (req, res) {
     var valid_params = req.body &&
