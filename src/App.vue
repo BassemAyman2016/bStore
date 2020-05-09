@@ -21,7 +21,7 @@ export default {
     }
   },
   created() {
-    this.$q.addressbarColor.set("#ff0000");
+    this.$q.addressbarColor.set("#1467ba");
   }
 };
 </script>
