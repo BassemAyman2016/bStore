@@ -3,7 +3,7 @@ require('dotenv').config();
 module.exports = {
     ENV: process.env.NODE_ENV,
     PORT: process.env.PORT,
-    secretOrKey: 'verySecretiveKey',
+    secretOrKey: process.env.SECRET,
     email_bot: process.env.email_bot,
     email_host: process.env.email_host,
     email_user: process.env.email_user,
