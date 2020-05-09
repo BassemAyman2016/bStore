@@ -1,12 +1,5 @@
-// const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken')
-// const passport = require('passport')
-// const Group = require('../models/Group');
 const ModelModel = require('../models/models')
 const AdminModel = require('../models/admins')
-// const GroupUser = require('../models/GroupUser');
-// const User = require('../models/User')
-// const tokenKey = require('../config').secretOrKey
 require('dotenv').config();
 
 const createModel =  async function (req, res) {
@@ -14,7 +7,6 @@ const createModel =  async function (req, res) {
     if(!valid_params){
         return res.status(400).send({ status: 'failure', message: 'model name is missing' });
     }
-    // const checkIfAdmin = await AdmAdminin.findOne({ _id : req.id })
     const checkIfAdmin = await AdminModel.getAdminById(req.id)
     if(!checkIfAdmin){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });
@@ -36,7 +28,6 @@ const deleteModel =  async function (req, res) {
         return res.status(400).send({ status: 'failure', message: 'model name is missing' });
     }
     const model_id = req.params.model_id
-    // const checkIfAdmin = await AdmAdminin.findOne({ _id : req.id })
     const checkIfAdmin = await AdminModel.getAdminById(req.id)
     if(!checkIfAdmin){
         return res.status(403).send({ status: 'failure', message: 'you are unauthorized to do this action' });

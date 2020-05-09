@@ -1,15 +1,9 @@
 const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken')
-// const passport = require('passport')
-// const Group = require('../models/Group');
 const AdminModel = require('../models/admins')
 const CustomerModel = require('../models/customers')
 const OrdersModel = require('../models/orders')
 const OrderProductsModel = require('../models/order_products')
 const ProductModel = require('../models/products')
-// const GroupUser = require('../models/GroupUser');
-// const User = require('../models/User')
-// const tokenKey = require('../config').secretOrKey
 require('dotenv').config();
 
 const adminSighUp =  async function (req, res) {
@@ -75,7 +69,7 @@ const deactivateAccount = async (req,res) => {
             const userOrders = await OrdersModel.getCertainCustomerOrders(userID)
             var ordersIDs = []
             userOrders.forEach(order=>{
-                if(!order.payed && !order.cancelled){
+                if(!order.paid && !order.cancelled){
                     ordersIDs.push(order.id)
                 }
             })
