@@ -16,6 +16,7 @@ module.exports = {
       charset: 'utf-8',
       timezone: 'utc'
     },
+    
     pool: {
       min: 2,
       max: 10
