@@ -11,6 +11,7 @@ const knex = knexInit(knexConfig[process.env.NODE_ENV])
 
 const app = express()
 
+
 Model.knex(knex)
 const category = require('./routes/categories')
 const admin = require('./routes/admins')
