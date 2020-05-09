@@ -123,9 +123,17 @@ export default {
   methods: {
     async getModels() {
       await this.$store.dispatch("fetchModels");
-      this.allModels = JSON.parse(
-        JSON.stringify(this.$store.getters.getModels)
-      );
+      var models = JSON.parse(JSON.stringify(this.$store.getters.getModels));
+      models = models.sort((a, b) => {
+        if (a.id > b.id) {
+          return -1;
+        }
+        if (a.id < b.id) {
+          return 1;
+        }
+        return 0;
+      });
+      this.allModels = models;
     },
     async deleteModel(Model) {
       this.selectedModel = Model;

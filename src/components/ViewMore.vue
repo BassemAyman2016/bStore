@@ -12,8 +12,8 @@
               class=" bg-grey-1 row q-mb-sm q-pa-sm items-center"
               style="width:100%;"
             >
-              <div class="col-xs-12 col-md-6">
-                <q-carousel
+              <div class="col-xs-12 col-md-6" style="height:100%">
+                <!-- <q-carousel
                   swipeable
                   animated
                   v-model="slide"
@@ -27,8 +27,59 @@
                     :key="index"
                     :name="index"
                     :img-src="image.img"
-                  />
-                </q-carousel>
+                  /> 
+                </q-carousel>-->
+                <div v-if="$q.platform.is.mobile" style="width:100%;">
+                  <div class="row q-mb-sm">
+                    <div
+                      class="main-image"
+                      :style="{
+                        'background-image': 'url(' + mainImage + ')'
+                      }"
+                    ></div>
+                  </div>
+                  <div class="row justify-center">
+                    <div
+                      class="col-2 side-image q-mx-xs"
+                      v-for="(image, index) in CurrentProduct.images"
+                      :key="index"
+                      :style="{
+                        'background-image': 'url(' + image.img + ')'
+                      }"
+                      @click="mainImage = image.img"
+                    >
+                      <!-- <img class="side-image__img" :src="image.img" alt="" /> -->
+                    </div>
+                  </div>
+                </div>
+                <div v-else>
+                  <div class="div row" style="width:100%;">
+                    <div class="col-2">
+                      <div class="column justify-center" style="height:100%">
+                        <div
+                          class="col-shrink side-image"
+                          v-for="(image, index) in CurrentProduct.images"
+                          :key="index"
+                          :style="{
+                            'background-image': 'url(' + image.img + ')',
+                            width: '100%'
+                          }"
+                          @click="mainImage = image.img"
+                        >
+                          <!-- <img class="side-image__img" :src="image.img" alt="" /> -->
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-9 q-ml-md">
+                      <div
+                        class="main-image"
+                        :style="{
+                          'background-image': 'url(' + mainImage + ')'
+                        }"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="col-xs-12 col-md-6">
                 <q-card-section>
@@ -175,7 +226,8 @@ export default {
     return {
       slide: 0,
       countOfProducts: 1,
-      showProductCard: false
+      showProductCard: false,
+      mainImage: ""
     };
   },
   methods: {
@@ -236,6 +288,7 @@ export default {
   },
   created() {
     window.scrollTo(0, 0);
+    this.mainImage = this.CurrentProduct.images[0].img;
   }
 };
 </script>
@@ -244,5 +297,31 @@ export default {
 .title-label {
   font-weight: bold;
   font-size: 16px;
+}
+.side-image {
+  height: 50px;
+  margin-bottom: 15px;
+  // background-color: rgb(206, 198, 198);
+  position: relative;
+  // background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  overflow: hidden;
+  border-radius: 5px;
+  &:hover {
+    cursor: pointer;
+    border: 1px solid grey;
+  }
+  &__img {
+    width: 100%;
+  }
+}
+.main-image {
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 350px;
 }
 </style>

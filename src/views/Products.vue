@@ -41,15 +41,15 @@
         </q-carousel>
       </div>
     </div>
-    <div class="row">
-      <div class="col-2 q-ml-sm" v-if="$q.screen.gt.sm">
+    <div class="row justify-center">
+      <!-- <div class="col-2 q-ml-sm" v-if="$q.screen.gt.sm">
         <q-card>
           <q-card-section>Category</q-card-section>
           <q-card-section>Brand</q-card-section>
           <q-card-section>Model</q-card-section>
           <q-card-section>Price Range</q-card-section>
         </q-card>
-      </div>
+      </div> -->
 
       <div class="col-sm-12 col-md-8">
         <div class="row">
@@ -266,7 +266,7 @@
           </q-card-actions>
         </q-card>
       </q-dialog>
-      <div class="col-2" v-if="$q.screen.gt.sm"></div>
+      <!-- <div class="col-2" v-if="$q.screen.gt.sm"></div> -->
     </div>
   </q-page>
 </template>

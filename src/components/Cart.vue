@@ -119,19 +119,46 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="showPaymentCard" persistent>
+      <q-card style="width: 300px">
+        <q-card-section class="row items-center">
+          <!-- <q-avatar icon="signal_wifi_off" color="primary" text-color="white" /> -->
+          <!-- <span class="q-ml-sm">Would you like to pay for your order ?</span> -->
+          <PaymentCard
+            :currentOrder="this.createdOrder"
+            @orderPaymentSuccess="paymentCardAction"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn
+            flat
+            label="cancel"
+            color="primary"
+            v-close-popup
+            @click="stripeCardAction"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
     <div class="col-2" v-if="$q.screen.gt.sm"></div>
   </div>
 </template>
 
 <script>
+import PaymentCard from "./PayementCard";
 export default {
   name: "Cart",
+  components: {
+    PaymentCard
+  },
   data() {
     return {
       totalPrice: 0,
       showPayCondition: false,
-      createdOrderId: null
+      createdOrder: null,
+      showPaymentCard: false
     };
   },
   methods: {
@@ -144,7 +171,7 @@ export default {
     },
     async createOrder() {
       await this.$store.dispatch("createOrder").then(res => {
-        if (res.order_id) this.createdOrderId = res.order_id;
+        if (res.id) this.createdOrder = res;
         this.$q.notify({
           type: res.status && res.status == "success" ? "positive" : "negative",
           message: res.message ? res.message : "Error Occured",
@@ -159,21 +186,29 @@ export default {
     },
     async paymentCardAction(value) {
       if (value == 2) {
-        await this.$store
-          .dispatch("payOrder", this.createdOrderId)
-          .then(res => {
-            this.$q.notify({
-              type:
-                res.status && res.status == "success" ? "positive" : "negative",
-              message: res.message ? res.message : "Error Occured",
-              timeout: 2000
-            });
-          });
+        // await this.$store
+        //   .dispatch("payOrder", this.createdOrder)
+        //   .then(res => {
+        //     this.$q.notify({
+        //       type:
+        //         res.status && res.status == "success" ? "positive" : "negative",
+        //       message: res.message ? res.message : "Error Occured",
+        //       timeout: 2000
+        //     });
+        //   });
+        this.showPaymentCard = true;
+      } else {
+        setTimeout(() => {
+          this.$store.commit("clearCart");
+          this.$router.push({ name: "Products" });
+        });
       }
-      setTimeout(() => {
-        this.$store.commit("clearCart");
-        this.$router.push({ name: "Products" });
-      });
+      this.showPayCondition = false;
+    },
+    stripeCardAction() {
+      this.$store.commit("clearCart");
+      this.$router.push({ name: "Products" });
+      this.showPaymentCard = false;
     }
   },
   computed: {

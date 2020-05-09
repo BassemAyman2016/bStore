@@ -123,9 +123,17 @@ export default {
   methods: {
     async getBrands() {
       await this.$store.dispatch("fetchBrands");
-      this.allBrands = JSON.parse(
-        JSON.stringify(this.$store.getters.getBrands)
-      );
+      var brands = JSON.parse(JSON.stringify(this.$store.getters.getBrands));
+      brands = brands.sort((a, b) => {
+        if (a.id > b.id) {
+          return -1;
+        }
+        if (a.id < b.id) {
+          return 1;
+        }
+        return 0;
+      });
+      this.allBrands = brands;
     },
     async deleteBrand(Brand) {
       this.selectedBrand = Brand;

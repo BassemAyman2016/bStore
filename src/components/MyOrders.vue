@@ -146,27 +146,20 @@
         </div>
       </div>
       <q-dialog v-model="showPay" persistent>
-        <q-card>
+        <q-card style="width: 300px">
           <q-card-section class="row items-center">
-            <span class="q-ml-sm"
-              >Are you sure you want to pay your order ?</span
-            >
+            <PaymentCard
+              :currentOrder="this.selectedOrder"
+              @orderPaymentSuccess="paymentCardAction"
+            />
           </q-card-section>
-
           <q-card-actions align="right">
             <q-btn
               flat
-              label="No"
+              label="cancel"
               color="primary"
               v-close-popup
-              @click="paymentCardAction(1)"
-            />
-            <q-btn
-              flat
-              label="Yes"
-              color="primary"
-              @click="paymentCardAction(2)"
-              v-close-popup
+              @click="paymentCardAction"
             />
           </q-card-actions>
         </q-card>
@@ -205,8 +198,12 @@
 
 <script>
 import api from "../store/api";
+import PaymentCard from "./PayementCard";
 export default {
   name: "MyOrders",
+  components: {
+    PaymentCard
+  },
   data() {
     return {
       totalPrice: 0,
@@ -228,20 +225,8 @@ export default {
       this.showPay = true;
     },
 
-    async paymentCardAction(value) {
-      if (value == 2) {
-        await this.$store
-          .dispatch("payOrder", this.selectedOrder.id)
-          .then(res => {
-            this.$q.notify({
-              type:
-                res.status && res.status == "success" ? "positive" : "negative",
-              message: res.message ? res.message : "Error Occured",
-              timeout: 2000
-            });
-          });
-        await this.getMyOrders();
-      }
+    async paymentCardAction() {
+      await this.getMyOrders();
       this.showPay = false;
       this.selectedOrder = null;
     },
@@ -275,18 +260,18 @@ export default {
               var outputTime = timeStamp.substring(11, 19);
               order.creation_time = outputTime;
 
-              if (!order.payed && !order.cancelled) {
+              if (!order.paid && !order.cancelled) {
                 order.Status = "Pending";
                 order.color = "yellow";
                 order.icon = "receipt";
               }
-              if (!order.payed && order.cancelled) {
+              if (!order.paid && order.cancelled) {
                 order.Status = "Cancelled";
                 order.color = "red";
                 order.icon = "close";
               }
-              if (order.payed && !order.cancelled) {
-                order.Status = "Payed";
+              if (order.paid && !order.cancelled) {
+                order.Status = "Paid";
                 order.color = "green";
                 order.icon = "check";
               }

@@ -123,9 +123,19 @@ export default {
   methods: {
     async getCategories() {
       await this.$store.dispatch("fetchCategories");
-      this.allCategories = JSON.parse(
+      var categories = JSON.parse(
         JSON.stringify(this.$store.getters.getCategories)
       );
+      categories = categories.sort((a, b) => {
+        if (a.id > b.id) {
+          return -1;
+        }
+        if (a.id < b.id) {
+          return 1;
+        }
+        return 0;
+      });
+      this.allCategories = categories;
     },
     async deleteCategory(category) {
       this.selectedCategory = category;

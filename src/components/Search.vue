@@ -45,7 +45,7 @@
                 <div class="col-12 q-my-md">
                   <DynamicDropdown
                     :labelName="'Category'"
-                    :inputData="allCategories"
+                    :inputData="displayCategories"
                     :fullWidth="true"
                     :singleOption="true"
                     @selectedOptions="filterOptionSelected($event, 0)"
@@ -55,7 +55,7 @@
                 <div class="col-12 q-my-md">
                   <DynamicDropdown
                     :labelName="'Brand'"
-                    :inputData="allBrands"
+                    :inputData="displayBrands"
                     :fullWidth="true"
                     :singleOption="true"
                     @selectedOptions="filterOptionSelected($event, 1)"
@@ -65,7 +65,7 @@
                 <div class="col-12 q-my-md">
                   <DynamicDropdown
                     :labelName="'Model'"
-                    :inputData="allModels"
+                    :inputData="displayModels"
                     :fullWidth="true"
                     :singleOption="true"
                     @selectedOptions="filterOptionSelected($event, 2)"
@@ -213,10 +213,121 @@
         </div>
       </div>
     </div>
+    <q-dialog v-model="showProductCard">
+      <q-card style="width:80vw">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6">Product:</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section v-if="showProductCard">
+          <div class="row jusitify-between">
+            <div class="col">
+              <div class="column">
+                <div class="col">Name : {{ selectedProduct.name }}</div>
+                <div class="col">
+                  Category: {{ selectedProduct.Category.name }}
+                </div>
+                <div class="col">Brand: {{ selectedProduct.Brand.name }}</div>
+                <div class="col">Model: {{ selectedProduct.Model.name }}</div>
+                <div class="col">Price: {{ selectedProduct.price }} EGP</div>
+              </div>
+            </div>
+            <div class="col-shrink ">
+              <div class="row items-center" style="height:100%;">
+                <div class="col">
+                  <q-btn
+                    round
+                    dense
+                    class="bg-red-8 text-white"
+                    size="md"
+                    icon="remove"
+                    :disable="selectedProduct.countOfProducts == 1"
+                    @click="decrementProductCount"
+                  />
+                </div>
+                <div class="col-shrink">
+                  <div class="text-h6 q-px-sm">
+                    {{ selectedProduct.countOfProducts }}
+                  </div>
+                </div>
+                <div class="col">
+                  <q-btn
+                    round
+                    dense
+                    class="bg-green-14 text-white"
+                    size="md"
+                    icon="add"
+                    @click="incrementProductCount"
+                    :disable="
+                      selectedProduct.stock <= selectedProduct.countOfProducts
+                    "
+                    :title="
+                      selectedProduct.stock <= selectedProduct.countOfProducts
+                        ? 'There are no more available products'
+                        : ''
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class=" row q-mt-md items-center"
+            :class="{ row: !$q.platform.is.mobile }"
+          >
+            <div class="col-auto">
+              Total Price:
+              {{ selectedProduct.price * selectedProduct.countOfProducts }}
+              EGP
+            </div>
+            <q-space />
+            <div class="col-shrink">
+              <q-btn
+                dense
+                class="bg-green-14 text-white"
+                :size="$q.screen.gt.xs ? 'md' : 'sm'"
+                icon="add"
+                label="Add To Cart"
+                @click="addObjectToCart"
+              />
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+    <q-dialog v-model="showDeleteDialog" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <span class="q-ml-sm"
+            >Are you sure you want to delete this product?</span
+          >
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn
+            flat
+            label="No"
+            color="primary"
+            v-close-popup
+            @click="deleteAction(1)"
+          />
+          <q-btn
+            flat
+            label="Yes"
+            color="primary"
+            @click="deleteAction(2)"
+            v-close-popup
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
+/* eslint-disable no-unused-vars */
 import DynamicDropdown from "./Fields/DynamicDropdown";
 export default {
   name: "Search",
@@ -237,23 +348,110 @@ export default {
       tempProducts: [],
       currentFilters: [],
       clearData: false,
-      showFiltersCard: true
+      showFiltersCard: true,
+      showProductCard: false,
+      showDeleteDialog: false,
+      selectedProduct: { name: "" },
+      brandsContainer: {},
+      categoriesContainer: {},
+      // modelsContainer: [],
+      displayCategories: [],
+      displayBrands: [],
+      displayModels: [],
+      rawOrder: [],
+      pureCategories: [],
+      pureBrands: [],
+      pureModels: []
     };
   },
   methods: {
     async pageCreated() {
       await this.$store.dispatch("fetchProducts");
       var allProducts = this.$store.getters.getProducts;
+      var currentCar = this.$store.getters.getCart;
+      var tempCategories = [];
+      var tempBrands = [];
+      var tempModels = [];
       var maxPrice = 0;
+      var data = [];
       allProducts.forEach(product => {
+        currentCar.forEach(cartObj => {
+          if (cartObj.product && cartObj.product.id == product.id) {
+            product.stock -= cartObj.count;
+          }
+        });
         if (product.price > maxPrice) {
           maxPrice = product.price;
         }
+        data.push({
+          Category: product.Category,
+          Brand: product.Brand,
+          Model: product.Model
+        });
+        if (this.brandsContainer[product.Brand.name])
+          this.brandsContainer[product.Brand.name].push(product.Model);
+        else this.brandsContainer[product.Brand.name] = [product.Model];
+        if (this.categoriesContainer[product.Category.name])
+          this.categoriesContainer[product.Category.name].push(product.Brand);
+        else this.categoriesContainer[product.Category.name] = [product.Brand];
+
+        tempModels.push(product.Model);
+        tempCategories.push(product.Category);
+        tempBrands.push(product.Brand);
       });
+      this.rawOrder = data;
+      Object.keys(this.categoriesContainer).forEach(key => {
+        // eslint-disable-next-line no-unused-vars
+        var currentArray = this.categoriesContainer[key];
+        currentArray = Object.values(
+          currentArray.reduce(
+            (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
+            {}
+          )
+        );
+        this.categoriesContainer[key] = currentArray;
+      });
+      Object.keys(this.brandsContainer).forEach(key => {
+        // eslint-disable-next-line no-unused-vars
+        var currentArray = this.brandsContainer[key];
+        currentArray = Object.values(
+          currentArray.reduce(
+            (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
+            {}
+          )
+        );
+        this.brandsContainer[key] = currentArray;
+      });
+
+      allProducts = allProducts.filter(product => product.stock > 0);
       this.intervalMax = maxPrice;
       this.priceRange.max = maxPrice;
       this.databaseProducts = allProducts;
       this.tempProducts = allProducts;
+      tempCategories = Object.values(
+        tempCategories.reduce(
+          (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
+          {}
+        )
+      );
+      tempBrands = Object.values(
+        tempBrands.reduce(
+          (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
+          {}
+        )
+      );
+      tempModels = Object.values(
+        tempModels.reduce(
+          (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
+          {}
+        )
+      );
+      this.displayCategories = tempCategories;
+      this.displayBrands = tempBrands;
+      this.displayModels = tempModels;
+      this.pureCategories = JSON.parse(JSON.stringify(tempCategories));
+      this.pureBrands = JSON.parse(JSON.stringify(tempBrands));
+      this.pureBrands = JSON.parse(JSON.stringify(tempModels));
     },
 
     async getData() {
@@ -350,7 +548,7 @@ export default {
           indexOfProduct = index;
         }
       });
-      this.products.forEach(singleProduct => {
+      this.tempProducts.forEach(singleProduct => {
         if (singleProduct.id == this.selectedProduct.id) {
           singleProduct.stock -= this.selectedProduct.countOfProducts;
         }
@@ -409,6 +607,50 @@ export default {
     },
     filterOptionSelected(value, index) {
       this.currentFilters[index] = value;
+      if (value[0] && value[0].name) {
+        switch (index) {
+          case 0:
+            this.displayBrands = this.categoriesContainer[value[0].name];
+            break;
+          case 1:
+            var currentModels = JSON.parse(
+              JSON.stringify(this.brandsContainer[value[0].name])
+            );
+            console.log("currentModels", currentModels);
+            var rawData = JSON.parse(JSON.stringify(this.rawOrder));
+            console.log("rawData", rawData);
+            var selectedCategory = null;
+            if (this.currentFilters[0] && this.currentFilters[0][0]) {
+              selectedCategory = JSON.parse(
+                JSON.stringify(this.currentFilters[0][0])
+              );
+            }
+
+            console.log("selectedCategory", selectedCategory);
+            var selectedBrand = JSON.parse(JSON.stringify(value[0]));
+            currentModels = currentModels.filter(singleModel => {
+              var found = false;
+              rawData.forEach(x => {
+                if (
+                  singleModel.name == x.Model.name &&
+                  selectedBrand.name == x.Brand.name
+                ) {
+                  if (selectedCategory) {
+                    if (selectedCategory.name == x.Category.name) {
+                      found = true;
+                    }
+                  } else {
+                    found = true;
+                  }
+                }
+              });
+              return found;
+            });
+            this.displayModels = currentModels;
+            break;
+        }
+      }
+
       this.applyFilters();
     },
     applyFilters() {
@@ -453,6 +695,9 @@ export default {
       this.priceRange.max = this.intervalMax;
       this.currentFilters = [[], [], []];
       this.tempProducts = [];
+      this.displayCategories = JSON.parse(JSON.stringify(this.pureCategories));
+      this.displayBrands = JSON.parse(JSON.stringify(this.pureBrands));
+      this.displayModels = JSON.parse(JSON.stringify(this.pureModels));
       setTimeout(() => {
         this.clearData = false;
         this.tempProducts = this.databaseProducts;
@@ -488,8 +733,8 @@ export default {
       return this.$store.getters.getUserType == "admin";
     }
   },
-  created() {
-    this.pageCreated();
+  async created() {
+    await this.pageCreated();
     if (this.$q.platform.is.mobile) {
       this.showFiltersCard = false;
     }

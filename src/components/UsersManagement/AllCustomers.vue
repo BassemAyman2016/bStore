@@ -364,18 +364,18 @@ export default {
                 var outputTime = timeStamp.substring(11, 19);
                 order.creation_time = outputTime;
 
-                if (!order.payed && !order.cancelled) {
+                if (!order.paid && !order.cancelled) {
                   order.Status = "Pending";
                   order.color = "yellow";
                   order.icon = "receipt";
                 }
-                if (!order.payed && order.cancelled) {
+                if (!order.paid && order.cancelled) {
                   order.Status = "Cancelled";
                   order.color = "red";
                   order.icon = "close";
                 }
-                if (order.payed && !order.cancelled) {
-                  order.Status = "Payed";
+                if (order.paid && !order.cancelled) {
+                  order.Status = "Paid";
                   order.color = "green";
                   order.icon = "check";
                 }

@@ -19,7 +19,8 @@ export default new Vuex.Store({
     brands: [],
     categories: [],
     cart: [],
-    selectedProduct: {}
+    selectedProduct: {},
+    customerName: ""
   },
   getters: {
     getUserId(state) {
@@ -48,6 +49,9 @@ export default new Vuex.Store({
     },
     getSelectedProduct(state) {
       return state.selectedProduct;
+    },
+    getCustomerName(state) {
+      return state.customerName;
     }
   },
   mutations: {
@@ -89,6 +93,9 @@ export default new Vuex.Store({
     },
     setSelectedProduct(state, value) {
       state.selectedProduct = value;
+    },
+    setName(state, value) {
+      state.customerName = value;
     }
   },
   actions: {
@@ -107,7 +114,17 @@ export default new Vuex.Store({
         .get(`categories/getCategories`)
         .then(res => {
           if (res.data.status == "success") {
-            context.commit("setCategories", res.data.data);
+            var data = res.data.data;
+            data = data.sort((a, b) => {
+              if (a.name < b.name) {
+                return -1;
+              }
+              if (a.name > b.firstname) {
+                return 1;
+              }
+              return 0;
+            });
+            context.commit("setCategories", data);
           }
         })
         .catch(err => console.log(err));
@@ -117,7 +134,17 @@ export default new Vuex.Store({
         .get(`brands/getBrands`)
         .then(res => {
           if (res.data.status == "success") {
-            context.commit("setBrands", res.data.data);
+            var data = res.data.data;
+            data = data.sort((a, b) => {
+              if (a.name < b.name) {
+                return -1;
+              }
+              if (a.name > b.firstname) {
+                return 1;
+              }
+              return 0;
+            });
+            context.commit("setBrands", data);
           }
         })
         .catch(err => console.log(err));
@@ -127,7 +154,17 @@ export default new Vuex.Store({
         .get(`models/getModels`)
         .then(res => {
           if (res.data.status == "success") {
-            context.commit("setModels", res.data.data);
+            var data = res.data.data;
+            data = data.sort((a, b) => {
+              if (a.name < b.name) {
+                return -1;
+              }
+              if (a.name > b.firstname) {
+                return 1;
+              }
+              return 0;
+            });
+            context.commit("setModels", data);
           }
         })
         .catch(err => console.log(err));
@@ -145,9 +182,15 @@ export default new Vuex.Store({
           return err.response.data;
         });
     },
-    async payOrder(context, orderId) {
+    async payOrder(context, order_object) {
+      const orderId = order_object.order_id;
+      const token = order_object.paymentToken;
+      console.log("order_object", order_object);
+      console.log("orderId", orderId);
       return api()
-        .put(`orders/payOrder/${orderId}`)
+        .put(`orders/payOrder/${orderId}`, {
+          paymentToken: token
+        })
         .then(res => {
           if (res.data.status == "success") {
             return res.data;
