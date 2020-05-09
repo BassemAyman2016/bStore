@@ -32,7 +32,8 @@ module.exports = {
   },
   production: {
     client: 'pg',
-    connection: process.env.DATABASE_CONNECTION_URL+'?ssl=true',
+    connection: "postgres://fweudelorjsxpz:86941b58f432160aa41fdc2c205777b812ba6a89316214425017d5f044294394@ec2-46-137-84-173.eu-west-1.compute.amazonaws.com:5432/d7hj8vms2ot9kn",
+    ssl:true,
     pool: {
       min: 2, // TODO might want to increase but based on the instance
       max: 10
