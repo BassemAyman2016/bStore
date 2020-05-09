@@ -17,27 +17,30 @@ export default async fileForm => {
   });
   Loading.show();
 
-  return axios
-    .post(CLOUDINARY_URL, fileForm)
-    .then(res => {
-      if (res.status == 200) {
+  return (
+    axios
+      .post(CLOUDINARY_URL, fileForm)
+      .then(res => {
+        if (res.status == 200) {
+          Loading.hide();
+          Notify.create({
+            type: "positive",
+            timeout: 1500,
+            message: "Image uploaded successfully"
+          });
+          return { status: "success", link: res.data.url };
+        }
+      })
+      // eslint-disable-next-line no-unused-vars
+      .catch(err => {
+        //console.log(err);
         Loading.hide();
         Notify.create({
-          type: "positive",
+          type: "negative",
           timeout: 1500,
-          message: "Image uploaded successfully"
+          message: "Error in image upload"
         });
-        return { status: "success", link: res.data.url };
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      Loading.hide();
-      Notify.create({
-        type: "negative",
-        timeout: 1500,
-        message: "Error in image upload"
-      });
-      return { status: "failure" };
-    });
+        return { status: "failure" };
+      })
+  );
 };

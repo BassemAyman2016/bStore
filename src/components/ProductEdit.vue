@@ -384,7 +384,7 @@ export default {
           inputIndex = index;
         }
       });
-      console.log(inputIndex);
+      //console.log(inputIndex);
       if (inputIndex !== -1) {
         this.imageLinks.splice(inputIndex, 1);
       }

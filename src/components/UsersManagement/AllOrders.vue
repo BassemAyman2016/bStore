@@ -286,7 +286,7 @@ export default {
         .get("orders/getAllOrders")
         .then(res => {
           if (res.data.status == "success") {
-            console.log("here");
+            //console.log("here");
             var holder = res.data.data;
             holder.forEach(order => {
               var timeStamp = order.created_at;

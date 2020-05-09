@@ -71,13 +71,15 @@ export default {
             }
           }
         })
+        // eslint-disable-next-line no-unused-vars
         .then(res => {
           this.$q.loading.hide();
-          console.log("re1s", res);
+          // console.log("re1s", res);
         })
+        // eslint-disable-next-line no-unused-vars
         .catch(err => {
           this.$q.loading.hide();
-          console.log("er1r", err);
+          // console.log("er1r", err);
         });
       await this.$store
         .dispatch("payOrder", {

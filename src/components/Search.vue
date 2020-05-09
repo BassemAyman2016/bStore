@@ -616,9 +616,9 @@ export default {
             var currentModels = JSON.parse(
               JSON.stringify(this.brandsContainer[value[0].name])
             );
-            console.log("currentModels", currentModels);
+            //console.log("currentModels", currentModels);
             var rawData = JSON.parse(JSON.stringify(this.rawOrder));
-            console.log("rawData", rawData);
+            //console.log("rawData", rawData);
             var selectedCategory = null;
             if (this.currentFilters[0] && this.currentFilters[0][0]) {
               selectedCategory = JSON.parse(
@@ -626,7 +626,7 @@ export default {
               );
             }
 
-            console.log("selectedCategory", selectedCategory);
+            //console.log("selectedCategory", selectedCategory);
             var selectedBrand = JSON.parse(JSON.stringify(value[0]));
             currentModels = currentModels.filter(singleModel => {
               var found = false;
