@@ -51,7 +51,7 @@
         </q-card>
       </div> -->
 
-      <div class="col-sm-12 col-md-8">
+      <div class="col-xs-12 col-md-8">
         <div class="row">
           <div class="col-12 justify-around">
             <div class="row justify-evenly">
@@ -79,7 +79,7 @@
                     <q-card-section>
                       <div class="">{{ product.Brand.name }}</div>
                       <div class="row justify-between">
-                        <div class="col-shrink text-subtitle1">
+                        <div class="col-shrink text-subtitle1 text-weight-bold">
                           {{ product.name }}
                         </div>
                         <div class="col-shrink text-subtitle1">
