@@ -6,34 +6,38 @@ const config = require('../config/setup')
 
 // create reusable transporter object using the default SMTP transport
 async function send(from, to, subject, text, html) {
-    console.log(config.email_user)
-    console.log(config.email_pass)
-    var mailerOptions={
-        service: "hotmail",
-        auth: {
-            user: config.email_user, // generated ethereal user
-            pass: config.email_pass // generated ethereal password
+    return new Promise((resolve,reject)=>{
+        var mailerOptions={
+            service: "hotmail",
+            auth: {
+                user: config.email_user, // generated ethereal user
+                pass: config.email_pass // generated ethereal password
+            }
         }
-    }
-    console.log(mailerOptions)
-    let transporter = nodemailer.createTransport(mailerOptions);
+        let transporter = nodemailer.createTransport(mailerOptions);
 
-    // send mail with defined transport object
-    let info = await transporter.sendMail({
-        from: `bStore <${config.email_bot}>`, // sender address
-        to: to, // list of receivers
-        subject: subject, // Subject line
-        text: text,// plain body
-        html: html
-    },
-    (error,info)=>{ 
-        console.log("error",error) 
-        console.log("info",info)}
-    );
+        // send mail with defined transport object
+        let info =  transporter.sendMail({
+            from: `bStore <${config.email_bot}>`, // sender address
+            to: to, // list of receivers
+            subject: subject, // Subject line
+            text: text,// plain body
+            html: html
+        },
+        (error,info)=>{ 
+            if (error) {
+                console.log("error is "+error);
+               resolve(false); // or use rejcet(false) but then you will have to handle errors
+            } 
+           else {
+               console.log('Email sent: ' + info.response);
+               resolve(true);
+            }
+        });
 
-    console.log("Message sent");
-    console.log(info);
-    return info
+        console.log("Message sent");
+        
+    })
 
 }
 module.exports = {
