@@ -9,15 +9,10 @@ async function send(from, to, subject, text, html) {
     console.log(config.email_user)
     console.log(config.email_pass)
     var mailerOptions={
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
+        service: "hotmail",
         auth: {
             user: config.email_user, // generated ethereal user
             pass: config.email_pass // generated ethereal password
-        },
-        tls: {
-            rejectUnauthorized: false
         }
     }
     console.log(mailerOptions)
