@@ -30,7 +30,11 @@ async function send(from, to, subject, text, html) {
         subject: subject, // Subject line
         text: text,// plain body
         html: html
-    });
+    },(error, info) => {
+        if (error) {
+                 console.log("error",error);
+        }
+        console.log('info', info)});
 
     console.log("Message sent");
 
