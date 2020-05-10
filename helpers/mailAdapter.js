@@ -14,12 +14,15 @@ async function send(from, to, subject, text, html) {
         auth: {
             user: config.email_user, // generated ethereal user
             pass: config.email_pass // generated ethereal password
+        },
+        tls: {
+            rejectUnauthorized: false
         }
     });
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-        from: config.email_bot, // sender address
+        from: `bStore <${config.email_bot}>`, // sender address
         to: to, // list of receivers
         subject: subject, // Subject line
         text: text,// plain body
