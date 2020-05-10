@@ -8,9 +8,10 @@ const config = require('../config/setup')
 async function send(from, to, subject, text, html) {
     console.log(config.email_user)
     console.log(config.email_pass)
-
-    let transporter = nodemailer.createTransport({
-        service: 'gmail',
+    var mailerOptions={
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
             user: config.email_user, // generated ethereal user
             pass: config.email_pass // generated ethereal password
@@ -18,7 +19,9 @@ async function send(from, to, subject, text, html) {
         tls: {
             rejectUnauthorized: false
         }
-    });
+    }
+    console.log(mailerOptions)
+    let transporter = nodemailer.createTransport(mailerOptions);
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
