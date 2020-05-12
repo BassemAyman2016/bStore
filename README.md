@@ -12,7 +12,7 @@ The backend is in the server folder and the frontend is in the client folder
 
 ## Built With
 
-* [Vue.js](https://vuejs.org/) - The progressive frontend framework used
+* [Vue.js](https://vuejs.org/) - The progressive frontend framework
 * [Node.js](https://nodejs.org/en/) - JavaScript runtime built on Chrome's V8 JavaScript engine
 * [Knex](http://knexjs.org/) - SQL query builder
 
