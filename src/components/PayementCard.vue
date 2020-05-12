@@ -62,30 +62,33 @@ export default {
       var clientSecret = this.currentOrder.payment_intent;
       const name = this.$store.getters.getCustomerName;
       this.$q.loading.show();
-      await this.stripe
-        .confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: this.card,
-            billing_details: {
-              name: name
-            }
-          }
-        })
-        // eslint-disable-next-line no-unused-vars
-        .then(res => {
-          this.$q.loading.hide();
-          // console.log("re1s", res);
-        })
-        // eslint-disable-next-line no-unused-vars
-        .catch(err => {
-          this.$q.loading.hide();
-          // console.log("er1r", err);
-        });
+
       await this.$store
         .dispatch("payOrder", {
           order_id: this.currentOrder.id
         })
-        .then(res => {
+        .then(async res => {
+          if (res.status && res.status == "success") {
+            await this.stripe
+              .confirmCardPayment(clientSecret, {
+                payment_method: {
+                  card: this.card,
+                  billing_details: {
+                    name: name
+                  }
+                }
+              })
+              // eslint-disable-next-line no-unused-vars
+              .then(res1 => {
+                this.$q.loading.hide();
+                // console.log("re1s", res);
+              })
+              // eslint-disable-next-line no-unused-vars
+              .catch(err => {
+                this.$q.loading.hide();
+                // console.log("er1r", err);
+              });
+          }
           this.$q.notify({
             type:
               res.status && res.status == "success" ? "positive" : "negative",
