@@ -28,10 +28,7 @@
                       v-for="(customer, index) in outputCustomers"
                       :key="index"
                     >
-                      <q-expansion-item
-                        expand-separator
-                        :disable="customer.Status == 'Unconfirmed'"
-                      >
+                      <q-expansion-item expand-separator>
                         <template v-slot:header>
                           <q-item-section avatar>
                             <q-avatar
