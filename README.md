@@ -17,7 +17,7 @@ The backend is in the server folder and the frontend is in the client folder
 * [Knex](http://knexjs.org/) - SQL query builder
 
 
-## Authors
+## Author
 
 * **Bassem Ayman** 
 
