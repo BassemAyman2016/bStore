@@ -81,21 +81,40 @@ export default {
               // eslint-disable-next-line no-unused-vars
               .then(res1 => {
                 this.$q.loading.hide();
+                this.$q.notify({
+                  type:
+                    res.status && res.status == "success"
+                      ? "positive"
+                      : "negative",
+                  message: res.message ? res.message : "Error Occured",
+                  timeout: 2000
+                });
+                this.$emit("orderPaymentSuccess");
                 // console.log("re1s", res);
               })
               // eslint-disable-next-line no-unused-vars
               .catch(err => {
                 this.$q.loading.hide();
+                this.$q.notify({
+                  type:
+                    res.status && res.status == "success"
+                      ? "positive"
+                      : "negative",
+                  message: res.message ? res.message : "Error Occured",
+                  timeout: 2000
+                });
+                // this.$emit("orderPaymentSuccess");
                 // console.log("er1r", err);
               });
+          } else {
+            this.$q.notify({
+              type:
+                res.status && res.status == "success" ? "positive" : "negative",
+              message: res.message ? res.message : "Error Occured",
+              timeout: 2000
+            });
+            this.$emit("orderPaymentSuccess");
           }
-          this.$q.notify({
-            type:
-              res.status && res.status == "success" ? "positive" : "negative",
-            message: res.message ? res.message : "Error Occured",
-            timeout: 2000
-          });
-          this.$emit("orderPaymentSuccess");
         });
     }
   },
