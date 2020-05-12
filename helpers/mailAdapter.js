@@ -34,8 +34,6 @@ async function send(from, to, subject, text, html) {
                resolve(true);
             }
         });
-
-        console.log("Message sent");
         
     })
 

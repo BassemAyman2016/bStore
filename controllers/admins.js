@@ -114,12 +114,13 @@ const activateAccount = async (req,res) => {
     if(!checkIfCustomerExists){
         return res.status(403).send({ status: 'failure', message: 'account does not exist' });
     }
-    if(!checkIfCustomerExists.deleted){
+    if(!checkIfCustomerExists.deleted && checkIfCustomerExists.confirmed){
         return res.status(400).send({ status: 'failure', message: 'Customer account is already active' });  
     }
     try {
         const activateCustomerAccount = await CustomerModel.activateAccount(userID);
-        if(activateCustomerAccount){
+        const confirmAccount = await CustomerModel.confirmAccount(userID)
+        if(activateCustomerAccount && confirmAccount){
             return res.status(200).send({ status: 'success', message:"Account activated successfully" });
         }else{
             return res.status(400).send({ status: 'failure', message: 'Error while activating customer' })
