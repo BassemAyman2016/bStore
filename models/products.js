@@ -8,7 +8,7 @@ class products extends Model {
     return 'products'
   }
   static getProductById (id) {
-    return products.query().findOne({id}).withGraphFetched ('[images,Category,Model,Brand]')
+    return products.query().findOne({id}).withGraphFetched('[images,Category,Model,Brand]')
   }
   static async getProductByName (name) {
     const fetchData = await products.query().findOne({name}).withGraphFetched ('[images,Category,Model,Brand]')

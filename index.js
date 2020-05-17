@@ -3,16 +3,15 @@ const express = require('express')
 const cors = require('cors')
 
 const bodyParser = require('body-parser');
+
 const Model = require('objection').Model
 const knexInit = require('knex')
-
 const knexConfig = require('./config/knexfile')
 const knex = knexInit(knexConfig[process.env.NODE_ENV])
+Model.knex(knex)
 
 const app = express()
 
-
-Model.knex(knex)
 const category = require('./routes/categories')
 const admin = require('./routes/admins')
 const session = require('./routes/sessions')
