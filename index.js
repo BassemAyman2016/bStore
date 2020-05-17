@@ -31,13 +31,9 @@ app.get('/', (req, res) => {
     res.send(`<h1>Welcome to bStore</h1>`)
 })
 
-// app.get('/api/customers/confirm/:id', (req, res) => {
-//     res.send(`<h1>Account confirmed successfully</h1>`)
-// })
-
 app.use('/api/categories', category);
 app.use('/api/admins', admin)
-app.use('/api/sessions', session); // Used For Login , Activation , Deactivation , Forgetting Password if needed
+app.use('/api/sessions', session); 
 app.use('/api/customers', customer)
 app.use('/api/models', model)
 app.use('/api/brands', brand)
