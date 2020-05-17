@@ -8,7 +8,7 @@ const fs = require('fs')
 const EmailAdapter = require('../helpers/mailAdapter')
 const path  = require('path')
 require('dotenv').config();
-
+const config = require('../config/setup')
 const Login =  async function (req, res) {
     var valid_params = req.body &&
     req.body.email && req.body.password 
@@ -78,7 +78,7 @@ const requestPasswordReset =  async function (req, res) {
         }
         try {
             const token = await crypto.randomBytes(20).toString('hex')
-            const frontEndLink = process.env.FRONTEND_URL
+            const frontEndLink = config.frontend_url
             const html = fs.readFileSync(path.resolve(__dirname, '../emails/forgetPasswordMail.html'), 'utf8').toString()
                 .replace(/\$\{token\}/g, `${frontEndLink}/resetPassword/${token}`)
             const sendMail = await EmailAdapter.send('no-reply@bStore.com', customer_email, 'Password Reset', 'reset your password', html)

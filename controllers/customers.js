@@ -8,7 +8,7 @@ const fs = require('fs')
 const EmailAdapter = require('../helpers/mailAdapter')
 const path  = require('path')
 require('dotenv').config();
-
+const config = require('../config/setup')
 const customerSignup =  async function (req, res) {
     var valid_params = req.body &&
     req.body.first_name && req.body.last_name && req.body.email && req.body.password &&
@@ -27,7 +27,7 @@ const customerSignup =  async function (req, res) {
             const newCustomer = await CustomerModel.createCustomer(req.body);
             if(newCustomer){
                 try{
-                const frontEndLink = process.env.FRONTEND_URL
+                const frontEndLink = config.frontend_url
                 const html = fs.readFileSync(path.resolve(__dirname, '../emails/htmlPage.html'), 'utf8').toString()
                         .replace(/\$\{token\}/g, `${frontEndLink}/confirmAccount/`+newCustomer.id)
                 const sendMail = await EmailAdapter.send('no-reply@bStore.com', email, 'Welcome To bStore', 'Congratulations, You are now an official bStore User', html)

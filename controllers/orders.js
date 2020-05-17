@@ -7,7 +7,7 @@ const fs = require('fs')
 const EmailAdapter = require('../helpers/mailAdapter')
 const path  = require('path')
 require('dotenv').config();
-
+const config = require('../config/setup')
 const createOrder =  async function (req, res) {
     var valid_params = req.body && req.body.products 
     
@@ -41,7 +41,7 @@ const createOrder =  async function (req, res) {
                 }else{
                     const knex = OrderProducts.knex()
                     const returnValue = await knex.transaction(async trx => {
-                        const stripe = require('stripe')(process.env.STRIPE_KEY);
+                        const stripe = require('stripe')(config.stripe_key);
                         const paymentIntent = await stripe.paymentIntents.create({
                             amount: priceSum*100,
                             currency: 'egp',
