@@ -13,7 +13,7 @@ async function send(from, to, subject, text, html) {
         let transporter = nodemailer.createTransport(mailerOptions);
 
         let info =  transporter.sendMail({
-            from: `bStore <${config.email_bot}>`,
+            from: `bStore <${config.email_user}>`,
             to: to, 
             subject: subject, 
             text: text,
