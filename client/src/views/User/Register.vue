@@ -135,6 +135,7 @@
 </template>
 
 <script>
+/* eslint-disable no-unreachable */
 import api from "../../store/api";
 export default {
   name: "Register",
@@ -185,6 +186,16 @@ export default {
           address: this.address,
           phone_number: this.phoneNumber
         };
+        var faultyFields = this.validateFields(apiObject);
+        if (faultyFields.error) {
+          this.$q.notify({
+            position: "bottom",
+            type: "negative",
+            timeout: "2000",
+            message: faultyFields.message
+          });
+          return;
+        }
         await api()
           .post("customers/customerSignup", apiObject)
           .then(res => {
@@ -240,6 +251,25 @@ export default {
         }
         return false;
       }
+    },
+    validateFields(inputs) {
+      var result = { error: false, message: "" };
+      var email = inputs.email;
+      if (!email.includes("@")) {
+        result.message = "Please enter a valid email address";
+        result.error = true;
+      }
+      var password = inputs.password;
+      if (!password || password.length < 8) {
+        result.message = "Password needs to be 8 characters long or more";
+        result.error = true;
+      }
+      var phone_number = inputs.phone_number;
+      if (isNaN(phone_number)) {
+        result.message = "Phone number cannot contain characters";
+        result.error = true;
+      }
+      return result;
     }
   },
   computed: {

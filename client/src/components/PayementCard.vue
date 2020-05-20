@@ -59,6 +59,23 @@ export default {
     },
     async submit(e) {
       e.preventDefault();
+      console.log("this.card", this.card);
+      if (this.card._empty) {
+        this.$q.notify({
+          type: "negative",
+          message: "Please fill your credit card number",
+          timeout: 2000
+        });
+        return;
+      }
+      if (this.card._invalid) {
+        this.$q.notify({
+          type: "negative",
+          message: "Please fill your credit card data correctly",
+          timeout: 2000
+        });
+        return;
+      }
       var clientSecret = this.currentOrder.payment_intent;
       const name = this.$store.getters.getCustomerName;
       this.$q.loading.show();
@@ -69,6 +86,7 @@ export default {
         })
         .then(async res => {
           if (res.status && res.status == "success") {
+            this.$q.loading.show();
             await this.stripe
               .confirmCardPayment(clientSecret, {
                 payment_method: {
@@ -90,7 +108,7 @@ export default {
                   timeout: 2000
                 });
                 this.$emit("orderPaymentSuccess");
-                // console.log("re1s", res);
+                console.log("re1s", res1);
               })
               // eslint-disable-next-line no-unused-vars
               .catch(err => {
@@ -103,8 +121,8 @@ export default {
                   message: res.message ? res.message : "Error Occured",
                   timeout: 2000
                 });
-                // this.$emit("orderPaymentSuccess");
-                // console.log("er1r", err);
+                this.$emit("orderPaymentSuccess");
+                console.log("er1r", err);
               });
           } else {
             this.$q.notify({

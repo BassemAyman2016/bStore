@@ -1,9 +1,6 @@
 const knex_migration_table_name = 'knex_migrations'
 const migrations_folder = `${__dirname}/../migrations`
 const seeds_folder = `${__dirname}/../seeds`
-// const pg = require('pg')
-// pg.defaults.ssl = true;
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 module.exports = {
   development: {
     client: 'pg',

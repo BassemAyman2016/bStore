@@ -401,7 +401,7 @@ export default {
       this.$q.notify({
         type: "positive",
         message: "Product(s) added to cart",
-        timeout: 10000
+        timeout: 3000
       });
       this.showProductCard = false;
     },

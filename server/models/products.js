@@ -1,14 +1,12 @@
+
 'use strict'
-
 const Model = require('objection').Model
-
 class products extends Model {
-  // Table name is the only required property.
   static get tableName () {
     return 'products'
   }
   static getProductById (id) {
-    return products.query().findOne({id}).withGraphFetched ('[images,Category,Model,Brand]')
+    return products.query().findOne({id}).withGraphFetched('[images,Category,Model,Brand]')
   }
   static async getProductByName (name) {
     const fetchData = await products.query().findOne({name}).withGraphFetched ('[images,Category,Model,Brand]')
