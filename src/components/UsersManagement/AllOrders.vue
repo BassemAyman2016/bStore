@@ -298,6 +298,11 @@ export default {
                 hoursPart+=2
               }else{
                 hoursPart==22?hoursPart='00':hoursPart='01'
+                var currentDate = new Date(outputDate)
+                var newDate = new Date()
+                newDate.setDate(currentDate.getDate() + 1);
+                var dateString = newDate.toISOString().substring(0, 10).toString()
+                order.creation_date = dateString;              
               }
               order.creation_time = hoursPart+outputTime.substring(2,10);
               if (!order.paid && !order.cancelled) {
