@@ -31,7 +31,7 @@
           class=" col-shrink bg-primary text-white q-mx-sm q-mb-md"
           @click="showFiltersCard = !showFiltersCard"
           icon="sort"
-          label="Show Filters"
+          :label="showFiltersCard ? 'Hide Filters' : 'Show Filters'"
         ></q-btn>
       </div>
     </div>
@@ -90,6 +90,32 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-12 q-my-md" v-if="showSortByPrice">
+                  <div
+                    class="row bg-white q-py-sm q-px-md"
+                    style="border: 1px solid rgba(70, 70, 70, 0.4);border-radius: 3px;"
+                  >
+                    <div class="col-12 q-mb-lg">Sort By Price</div>
+                    <div class="col-12 justify-center">
+                      <div class="row justify-center">
+                        <div class="col-shrink">
+                          <q-btn
+                            class="bg-green text-white q-mx-sm"
+                            @click="sortByPrice('asc')"
+                            >Ascending</q-btn
+                          >
+                        </div>
+                        <div class="col-shrink">
+                          <q-btn
+                            class="bg-red text-white q-mx-sm"
+                            @click="sortByPrice('desc')"
+                            >Descending</q-btn
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div class="col-12 q-my-md">
                   <div class="row justify-center">
                     <q-btn
@@ -113,8 +139,8 @@
                   'animated swing': animation,
                   'disabled dimmed': product.stock <= 0
                 }"
-                v-for="(product, index) in outputProducts"
-                :key="index"
+                v-for="product in outputProducts"
+                :key="product.id"
                 :title="product.stock <= 0 ? 'Unavailable' : ''"
               >
                 <div class="column justify-between" style="height:100%;">
@@ -361,7 +387,8 @@ export default {
       rawOrder: [],
       pureCategories: [],
       pureBrands: [],
-      pureModels: []
+      pureModels: [],
+      showSortByPrice: false
     };
   },
   methods: {
@@ -451,7 +478,7 @@ export default {
       this.displayModels = tempModels;
       this.pureCategories = JSON.parse(JSON.stringify(tempCategories));
       this.pureBrands = JSON.parse(JSON.stringify(tempBrands));
-      this.pureBrands = JSON.parse(JSON.stringify(tempModels));
+      this.pureModels = JSON.parse(JSON.stringify(tempModels));
     },
 
     async getData() {
@@ -704,6 +731,29 @@ export default {
       }, 100);
 
       this.applyFilters();
+    },
+    sortByPrice(text) {
+      if (text == "asc") {
+        this.tempProducts = this.tempProducts.sort((a, b) => {
+          if (a.price > b.price) {
+            return 1;
+          }
+          if (a.price < b.price) {
+            return -1;
+          }
+          return 0;
+        });
+      } else {
+        this.tempProducts = this.tempProducts.sort((a, b) => {
+          if (a.price > b.price) {
+            return -1;
+          }
+          if (a.price < b.price) {
+            return 1;
+          }
+          return 0;
+        });
+      }
     }
   },
   computed: {

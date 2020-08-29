@@ -354,23 +354,36 @@ export default {
                 cust.color = "grey";
                 cust.Status = "undefiend";
               }
+              cust.orders = cust.orders.sort((a, b) => {
+                if (a.id < b.id) {
+                  return 1;
+                }
+                if (a.id > b.id) {
+                  return -1;
+                }
+                return 0;
+              });
+
               cust.orders.forEach(order => {
                 var timeStamp = order.created_at;
                 var outputDate = timeStamp.substring(0, 10);
                 order.creation_date = outputDate;
                 var outputTime = timeStamp.substring(11, 19);
-                var hoursPart = parseInt(outputTime.substring(0,2))
-                if(hoursPart<22){
-                  hoursPart+=2
-                }else{
-                  hoursPart==22?hoursPart='00':hoursPart='01'
-                  var currentDate = new Date(outputDate)
-                  var newDate = new Date()
+                var hoursPart = parseInt(outputTime.substring(0, 2));
+                if (hoursPart < 22) {
+                  hoursPart += 2;
+                } else {
+                  hoursPart == 22 ? (hoursPart = "00") : (hoursPart = "01");
+                  var currentDate = new Date(outputDate);
+                  var newDate = new Date();
                   newDate.setDate(currentDate.getDate() + 1);
-                  var dateString = newDate.toISOString().substring(0, 10).toString()
+                  var dateString = newDate
+                    .toISOString()
+                    .substring(0, 10)
+                    .toString();
                   order.creation_date = dateString;
                 }
-                order.creation_time = hoursPart+outputTime.substring(2,10);
+                order.creation_time = hoursPart + outputTime.substring(2, 10);
                 if (!order.paid && !order.cancelled) {
                   order.Status = "Pending";
                   order.color = "yellow";
