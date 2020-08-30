@@ -80,66 +80,6 @@ export default {
       const name = this.$store.getters.getCustomerName;
       this.$q.loading.show();
 
-      // await this.$store
-      //   .dispatch("payOrder", {
-      //     order_id: this.currentOrder.id
-      //   })
-      //   .then(async res => {
-      //     if (res.status && res.status == "success") {
-      //       this.$q.loading.show();
-      //       await this.stripe
-      //         .confirmCardPayment(clientSecret, {
-      //           payment_method: {
-      //             card: this.card,
-      //             billing_details: {
-      //               name: name
-      //             }
-      //           }
-      //         })
-      //         // eslint-disable-next-line no-unused-vars
-      // .then(async res1 => {
-      //   this.$q.loading.hide();
-      // this.$q.notify({
-      //   type:
-      //     res.status && res.status == "success" && !res1.error
-      //       ? "positive"
-      //       : "negative",
-      //   message:
-      //     res.message && !res1.error ? res.message : "Error Occured",
-      //   timeout: 2000
-      // });
-      //   if (res1.error) {
-      //     await this.$store.dispatch("unpayOrder", {
-      //       order_id: this.currentOrder.id
-      //     });
-      //   }
-      //   this.$emit("orderPaymentSuccess");
-      //   console.log("re1s", res1, typeof res1, Object.keys(res1));
-      // })
-      //         // eslint-disable-next-line no-unused-vars
-      //         .catch(async err => {
-      //           this.$q.loading.hide();
-      //           this.$q.notify({
-      //             type:
-      //               res.status && res.status == "success"
-      //                 ? "positive"
-      //                 : "negative",
-      //             message: res.message ? res.message : "Error Occured",
-      //             timeout: 2000
-      //           });
-      //           this.$emit("orderPaymentSuccess");
-      //           console.log("er1r", err);
-      //         });
-      //     } else {
-      //       this.$q.notify({
-      //         type:
-      //           res.status && res.status == "success" ? "positive" : "negative",
-      //         message: res.message ? res.message : "Error Occured",
-      //         timeout: 2000
-      //       });
-      //       this.$emit("orderPaymentSuccess");
-      //     }
-      //   });
       await this.stripe
         .confirmCardPayment(clientSecret, {
           payment_method: {
@@ -157,6 +97,7 @@ export default {
               message: "Error occured while paying order",
               timeout: 2000
             });
+            console.log("res1", res1);
             return;
           } else {
             await this.$store
