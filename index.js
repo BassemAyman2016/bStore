@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 
 const Model = require('objection').Model
 const knexInit = require('knex')
-const knexConfig = require('./config/knexfile')
+const knexConfig = require('./knexfile')
 const knex = knexInit(knexConfig[process.env.NODE_ENV])
 Model.knex(knex)
 
