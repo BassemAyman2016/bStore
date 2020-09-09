@@ -31,7 +31,7 @@ const createProduct =  async function (req, res) {
     }else{
         const name = req.body.name
         const findIfProductWithSameNameExists = await ProductModel.getProductByName(name);
-        if(findIfProductWithSameNameExists){
+        if(findIfProductWithSameNameExists && findIfProductWithSameNameExists.length>0){
             return res.status(400).send({ status: 'failure', message: 'Product already exists' })
         }else{
             const newProduct = await ProductModel.createProduct(req.body);

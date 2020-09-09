@@ -258,8 +258,21 @@ export default {
               var outputDate = timeStamp.substring(0, 10);
               order.creation_date = outputDate;
               var outputTime = timeStamp.substring(11, 19);
-              order.creation_time = outputTime;
-
+              var hoursPart = parseInt(outputTime.substring(0, 2));
+              if (hoursPart < 22) {
+                hoursPart += 2;
+              } else {
+                hoursPart == 22 ? (hoursPart = "00") : (hoursPart = "01");
+                var currentDate = new Date(outputDate);
+                var newDate = new Date();
+                newDate.setDate(currentDate.getDate() + 1);
+                var dateString = newDate
+                  .toISOString()
+                  .substring(0, 10)
+                  .toString();
+                order.creation_date = dateString;
+              }
+              order.creation_time = hoursPart + outputTime.substring(2, 10);
               if (!order.paid && !order.cancelled) {
                 order.Status = "Pending";
                 order.color = "yellow";

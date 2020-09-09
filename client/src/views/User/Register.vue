@@ -2,10 +2,10 @@
   <div
     class="window-height window-width row justify-center items-center register"
   >
-    <div class="col q-pa-lg">
+    <div class="col ">
       <div class="row justify-center">
         <q-card
-          class="shadow-24 animated rollIn register-card col-xs-10 col-md-4"
+          class="shadow-24 animated rollIn register-card col-xs-11 col-md-4"
         >
           <q-card-section class="bg-red-14">
             <div class="text-h5 text-white q-my-md" style="text-align:center;">

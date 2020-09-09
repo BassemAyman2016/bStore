@@ -72,6 +72,7 @@
                             :placeholder="'Category'"
                             @selected="dropdownInput($event, 'category')"
                             :clearData="dataEraser"
+                            :maxItem="availableCategories.length"
                           />
                         </div>
                         <div class="col q-mb-md">
@@ -80,6 +81,7 @@
                             :placeholder="'Brand'"
                             @selected="dropdownInput($event, 'brand')"
                             :clearData="dataEraser"
+                            :maxItem="availableBrands.length"
                           />
                         </div>
                         <div class="col">
@@ -88,6 +90,7 @@
                             :placeholder="'Model'"
                             @selected="dropdownInput($event, 'model')"
                             :clearData="dataEraser"
+                            :maxItem="availableModels.length"
                           />
                         </div>
                       </div>

@@ -143,6 +143,7 @@ export default {
           if (this.selectedOptions.length == 0) {
             option.selected = true;
             this.selectedOptions.push(option);
+            this.toggleDisplay()
           }
         } else {
           option.selected = true;

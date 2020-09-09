@@ -9,7 +9,7 @@ class products extends Model {
     return products.query().findOne({id}).withGraphFetched('[images,Category,Model,Brand]')
   }
   static async getProductByName (name) {
-    const fetchData = await products.query().findOne({name}).withGraphFetched ('[images,Category,Model,Brand]')
+    const fetchData = await products.query().select('*').where('name','ilike',name).withGraphFetched ('[images,Category,Model,Brand]')
     return fetchData
   }
 

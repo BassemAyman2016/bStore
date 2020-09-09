@@ -19,20 +19,20 @@
           />
           <q-carousel-slide
             :name="2"
-            img-src="https://isellpackaging.com/wp-content/uploads/2016/05/shopping-bags-slider.jpg"
+            img-src="https://dailykroy.com/wp-content/uploads/2018/03/banner2.jpg"
           />
 
           <q-carousel-slide
             :name="3"
-            img-src="https://lh4.googleusercontent.com/proxy/P-AfSit8mYBRcuSYdhebKWcedXyJD7uN0Sol-AfwHC_BA1uBFeX6XQdLLKAyMVDIa3mcxZ1xAV93mPctdyksKgkBWIenaSt3g9nbjLWYhcO7V24iv4m6H0FH9u5y1B6HumGB"
+            img-src="https://www.dipeshpatel.com/wp-content/uploads/2018/12/Screenshot-14.png"
           />
           <q-carousel-slide
             :name="4"
-            img-src="https://dailykroy.com/wp-content/uploads/2018/03/banner2.jpg"
+            img-src="https://isellpackaging.com/wp-content/uploads/2016/05/shopping-bags-slider.jpg"
           />
           <q-carousel-slide
             :name="5"
-            img-src="https://www.dipeshpatel.com/wp-content/uploads/2018/12/Screenshot-14.png"
+            img-src="https://lh4.googleusercontent.com/proxy/P-AfSit8mYBRcuSYdhebKWcedXyJD7uN0Sol-AfwHC_BA1uBFeX6XQdLLKAyMVDIa3mcxZ1xAV93mPctdyksKgkBWIenaSt3g9nbjLWYhcO7V24iv4m6H0FH9u5y1B6HumGB"
           />
           <q-carousel-slide
             :name="6"
